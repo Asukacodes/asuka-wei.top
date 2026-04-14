@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asuka Wei | 个人站</title>
+    <meta
+      name="description"
+      content="Asuka Wei 的个人网站，包含视频、文章、笔记和开源项目。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="logo" href="#top">Asuka Wei</a>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="#about">关于</a></li>
+            <li><a href="#projects">项目</a></li>
+            <li><a href="#links">链接</a></li>
+            <li><a href="#contact">联系</a></li>
+          </ul>
+        </nav>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="切换主题">
+          主题
+        </button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero container">
+        <p class="kicker">Technical Animator · Developer</p>
+        <h1>Asuka Wei 的个人空间</h1>
+        <p class="hero-copy">
+          这里收录了我的视频内容、技术文章、个人笔记和开源项目。后续会持续更新更多创作与技术实践。
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#links">查看链接</a>
+          <a class="btn btn-secondary" href="https://github.com/Asukacodes" target="_blank" rel="noreferrer">访问 GitHub</a>
+        </div>
+      </section>
+
+      <section id="about" class="section container">
+        <h2>关于我</h2>
+        <p>
+          我是 Asuka，目前专注于技术动画、实时工具链和创意技术实践。这个站点是我对外的统一入口，用来沉淀作品与思考。
+        </p>
+      </section>
+
+      <section id="projects" class="section container">
+        <div class="section-head">
+          <h2>项目与内容</h2>
+          <p>以下入口已按你的真实地址配置完成。</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <h3>Bilibili 视频</h3>
+            <p>发布视频内容与动态更新。</p>
+            <a href="https://space.bilibili.com/441116886" target="_blank" rel="noreferrer">立即访问</a>
+          </article>
+          <article class="card">
+            <h3>知乎文章</h3>
+            <p>记录观点、方法与经验总结。</p>
+            <a href="https://www.zhihu.com/people/wei-wu-hen-39/posts" target="_blank" rel="noreferrer">立即访问</a>
+          </article>
+          <article class="card">
+            <h3>Notion 笔记</h3>
+            <p>公开文档、清单与持续整理的资料。</p>
+            <a href="https://neighborly-jaborosa-f48.notion.site/27baa5a50eb180b78134f2553d3bf486?v=290aa5a50eb180cbb324000c5c00a3f9&pvs=74" target="_blank" rel="noreferrer">立即访问</a>
+          </article>
+        </div>
+      </section>
+
+      <section id="links" class="section container">
+        <h2>全部链接</h2>
+        <ul class="social-list">
+          <li class="social-item">
+            <a href="https://space.bilibili.com/441116886" target="_blank" rel="noreferrer">Bilibili</a>
+            <button class="copy-btn" type="button" data-copy-url="https://space.bilibili.com/441116886">
+              复制
+            </button>
+          </li>
+          <li class="social-item">
+            <a href="https://www.zhihu.com/people/wei-wu-hen-39/posts" target="_blank" rel="noreferrer">Zhihu</a>
+            <button class="copy-btn" type="button" data-copy-url="https://www.zhihu.com/people/wei-wu-hen-39/posts">
+              复制
+            </button>
+          </li>
+          <li class="social-item">
+            <a href="https://neighborly-jaborosa-f48.notion.site/27baa5a50eb180b78134f2553d3bf486?v=290aa5a50eb180cbb324000c5c00a3f9&pvs=74" target="_blank" rel="noreferrer">Notion</a>
+            <button class="copy-btn" type="button" data-copy-url="https://neighborly-jaborosa-f48.notion.site/27baa5a50eb180b78134f2553d3bf486?v=290aa5a50eb180cbb324000c5c00a3f9&pvs=74">
+              复制
+            </button>
+          </li>
+          <li class="social-item">
+            <a href="https://github.com/Asukacodes" target="_blank" rel="noreferrer">GitHub</a>
+            <button class="copy-btn" type="button" data-copy-url="https://github.com/Asukacodes">
+              复制
+            </button>
+          </li>
+        </ul>
+        <p id="copyStatus" class="copy-status" aria-live="polite"></p>
+      </section>
+
+      <section class="section container">
+        <h2>二维码</h2>
+        <p>可直接扫码访问你的外部平台主页。</p>
+        <div class="qr-grid">
+          <article class="qr-card">
+            <img
+              class="qr-image"
+              data-qr-url="https://space.bilibili.com/441116886"
+              alt="Bilibili 二维码"
+            />
+            <h3>Bilibili</h3>
+          </article>
+          <article class="qr-card">
+            <img
+              class="qr-image"
+              data-qr-url="https://www.zhihu.com/people/wei-wu-hen-39/posts"
+              alt="Zhihu 二维码"
+            />
+            <h3>Zhihu</h3>
+          </article>
+          <article class="qr-card">
+            <img
+              class="qr-image"
+              data-qr-url="https://neighborly-jaborosa-f48.notion.site/27baa5a50eb180b78134f2553d3bf486?v=290aa5a50eb180cbb324000c5c00a3f9&pvs=74"
+              alt="Notion 二维码"
+            />
+            <h3>Notion</h3>
+          </article>
+          <article class="qr-card">
+            <img
+              class="qr-image"
+              data-qr-url="https://github.com/Asukacodes"
+              alt="GitHub 二维码"
+            />
+            <h3>GitHub</h3>
+          </article>
+        </div>
+      </section>
+
+      <section id="contact" class="section container">
+        <h2>联系我</h2>
+        <p>
+          你可以通过 GitHub 联系我：
+          <a href="https://github.com/Asukacodes" target="_blank" rel="noreferrer">@Asukacodes</a>
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Asuka Wei. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
