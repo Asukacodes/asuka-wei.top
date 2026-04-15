@@ -9,6 +9,15 @@
 
   var animTimer = 0;
   var currentTheme = 0;
+  var hardwareThreads = navigator.hardwareConcurrency || 4;
+  var deviceMemory = navigator.deviceMemory || 4;
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var lowPowerMode = prefersReducedMotion || hardwareThreads <= 4 || deviceMemory <= 4;
+  var noiseOctaves = lowPowerMode ? 2 : 3;
+  var opacityOctaves = lowPowerMode ? 2 : 3;
+  var matrixDensity = lowPowerMode ? 1.14 : 1.0;
+  var minFrameInterval = lowPowerMode ? 3 : 2;
+  var matrixFrameInterval = minFrameInterval;
 
   // ---- Per-section themes ----
   // 0=HERO(machine/hex), 1=ABOUT(binary), 2=PROJECTS(symbols), 3=CONTACT(code)
@@ -238,16 +247,16 @@
     var offsetX = seed.offsetX + (x / seed.scaleX);
     var offsetY = seed.offsetY + (y / seed.scaleY);
 
-    var firstX = perlin(offsetX, offsetY, 3);
-    var firstY = perlin(offsetX + animTimer * seed.firstSpeedY, offsetY + animTimer * seed.firstSpeedY, 3);
+    var firstX = perlin(offsetX, offsetY, noiseOctaves);
+    var firstY = perlin(offsetX + animTimer * seed.firstSpeedY, offsetY + animTimer * seed.firstSpeedY, noiseOctaves);
 
     var secondX = perlin(
       offsetX + seed.secondFreqX * firstX + animTimer * seed.secondSpeedX,
-      offsetY + seed.secondFreqX * firstY + animTimer * seed.secondSpeedX, 3);
+      offsetY + seed.secondFreqX * firstY + animTimer * seed.secondSpeedX, noiseOctaves);
 
     var secondY = perlin(
       offsetX + seed.secondFreqY * firstX + animTimer * seed.secondSpeedY,
-      offsetY + seed.secondFreqY * firstY + animTimer * seed.secondSpeedY, 3);
+      offsetY + seed.secondFreqY * firstY + animTimer * seed.secondSpeedY, noiseOctaves);
 
     var finalX = offsetX + firstX * seed.firstMixX + secondX * seed.secondMixX;
     var finalY = offsetY + firstY * seed.firstMixY + secondY * seed.secondMixY;
@@ -263,7 +272,7 @@
 
     var opacity = perlin(
       seed.opacityMix0 * finalX + seed.opacityMix1 * firstX,
-      seed.opacityMix2 * finalY + seed.opacityMix3 * secondY, 3);
+      seed.opacityMix2 * finalY + seed.opacityMix3 * secondY, opacityOctaves);
 
     var dark = seed.dark || { r: 50, g: 45, b: 10 };
     cr = lerp(dark.r / 255, cr, opacity * 0.7);
@@ -312,11 +321,11 @@
   }
 
   function getCols(el) {
-    return Math.floor(el.clientWidth / (parseFloat(getComputedStyle(el).fontSize) * 0.65));
+    return Math.floor(el.clientWidth / ((parseFloat(getComputedStyle(el).fontSize) * 0.65) * matrixDensity));
   }
 
   function getRows(el) {
-    return Math.floor(el.clientHeight / (parseFloat(getComputedStyle(el).fontSize) * 1.15));
+    return Math.floor(el.clientHeight / ((parseFloat(getComputedStyle(el).fontSize) * 1.15) * matrixDensity));
   }
 
   var leftCols, leftRows, rightCols, rightRows;
@@ -350,8 +359,9 @@
     lastTime = ts;
     animTimer += delta;
 
-    // Only update board every 2nd frame to reduce CPU load
-    if (++frameCount % 2 === 0) {
+    // Adaptive update interval: automatically degrade on slow devices.
+    if (++frameCount % matrixFrameInterval === 0) {
+      var renderStart = performance.now();
       updateSeedDataTarget("asukawei-left", currentTheme);
       updateSeedDataCurrent();
       updateBoard(leftChars, leftColors, leftCols, leftRows);
@@ -359,6 +369,13 @@
       updateSeedDataTarget("asukawei-right", currentTheme);
       updateSeedDataCurrent();
       updateBoard(rightChars, rightColors, rightCols, rightRows);
+
+      var renderCost = performance.now() - renderStart;
+      if (renderCost > 15 && matrixFrameInterval < 4) {
+        matrixFrameInterval += 1;
+      } else if (renderCost < 9 && matrixFrameInterval > minFrameInterval) {
+        matrixFrameInterval -= 1;
+      }
     }
 
     requestAnimationFrame(loop);
@@ -401,6 +418,28 @@
   var isAnimating = false;
   var wheelAccum = 0;
   var wiperState = null;
+  var hardwareThreads = navigator.hardwareConcurrency || 4;
+  var deviceMemory = navigator.deviceMemory || 4;
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var lowPowerFx = prefersReducedMotion || hardwareThreads <= 4 || deviceMemory <= 4;
+  var fxResolutionScale = lowPowerFx ? 0.62 : 0.82;
+  var fxIntensity = lowPowerFx ? 0.65 : 1.0;
+
+  function createFxCanvas(container) {
+    var cssW = window.innerWidth;
+    var cssH = window.innerHeight;
+    var renderW = Math.max(1, Math.floor(cssW * fxResolutionScale));
+    var renderH = Math.max(1, Math.floor(cssH * fxResolutionScale));
+    var canvas = document.createElement("canvas");
+    canvas.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%";
+    canvas.width = renderW;
+    canvas.height = renderH;
+    container.appendChild(canvas);
+    var ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
+    if (!ctx) return null;
+    ctx.setTransform(renderW / cssW, 0, 0, renderH / cssH, 0, 0);
+    return { canvas: canvas, ctx: ctx, width: cssW, height: cssH };
+  }
 
   // Per-section CSS theme variables
   var sectionThemes = [
@@ -504,13 +543,14 @@
     container.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden";
     document.body.appendChild(container);
 
-    var canvas = document.createElement("canvas");
-    canvas.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%";
-    container.appendChild(canvas);
-    var ctx = canvas.getContext("2d");
-
-    var W = canvas.width = window.innerWidth;
-    var H = canvas.height = window.innerHeight;
+    var fxCanvas = createFxCanvas(container);
+    if (!fxCanvas) {
+      isAnimating = false;
+      return;
+    }
+    var ctx = fxCanvas.ctx;
+    var W = fxCanvas.width;
+    var H = fxCanvas.height;
 
     var matrixLeft = document.getElementById("matrix-left");
     var matrixText = matrixLeft ? matrixLeft.textContent : "0101010101";
@@ -524,18 +564,18 @@
     if (!glyphPool.length) glyphPool = ["0", "1", "6", "*", "^"];
 
     var tileCanvas = document.createElement("canvas");
-    var tileW = 320;
+    var tileW = lowPowerFx ? 260 : 320;
     tileCanvas.width = tileW;
     tileCanvas.height = H;
     var tileCtx = tileCanvas.getContext("2d");
-    var rowH = 13;
-    var colW = 10;
+    var rowH = lowPowerFx ? 15 : 13;
+    var colW = lowPowerFx ? 12 : 10;
     var rows = Math.ceil(H / rowH) + 2;
     var cols = Math.ceil(tileW / colW) + 2;
 
     function drawMachineTile(phase, tintColor) {
       tileCtx.clearRect(0, 0, tileW, H);
-      tileCtx.font = "12px 'Share Tech Mono', monospace";
+      tileCtx.font = (lowPowerFx ? "11px" : "12px") + " 'Share Tech Mono', monospace";
       tileCtx.textBaseline = "top";
       for (var y = 0; y < rows; y++) {
         for (var x = 0; x < cols; x++) {
@@ -825,14 +865,12 @@
     container.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden";
     document.body.appendChild(container);
 
-    var canvas = document.createElement("canvas");
-    canvas.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%";
-    container.appendChild(canvas);
-    var ctx = canvas.getContext("2d");
-
-    var W = canvas.width = window.innerWidth;
-    var H = canvas.height = window.innerHeight;
-    var railW = Math.max(80, Math.floor(W * 0.12));
+    var fxCanvas = createFxCanvas(container);
+    if (!fxCanvas) return;
+    var ctx = fxCanvas.ctx;
+    var W = fxCanvas.width;
+    var H = fxCanvas.height;
+    var railW = Math.max(70, Math.floor(W * (lowPowerFx ? 0.1 : 0.12)));
 
     function spawnParticle(side) {
       var onLeft = side === "left";
@@ -850,13 +888,13 @@
     }
 
     var particles = [];
-    var particleCount = Math.max(50, Math.floor(W / 24));
+    var particleCount = Math.max(30, Math.floor((W / 24) * fxIntensity));
     for (var p = 0; p < particleCount; p++) {
       particles.push(spawnParticle(p % 2 === 0 ? "left" : "right"));
     }
 
     var streaks = [];
-    for (var s = 0; s < 14; s++) {
+    for (var s = 0; s < Math.max(8, Math.floor(14 * fxIntensity)); s++) {
       var leftSide = s % 2 === 0;
       streaks.push({
         x: leftSide ? Math.random() * railW : W - railW + Math.random() * railW,
@@ -1043,6 +1081,32 @@
    =========================== */
 (function initGlitch() {
   document.querySelectorAll(".project-card").forEach(function (card) {
+    var actionLink = card.querySelector(".card-action");
+    var href = actionLink ? actionLink.getAttribute("href") : "";
+    var target = actionLink ? (actionLink.getAttribute("target") || "_self") : "_self";
+
+    // Make the full card reliably clickable as a fallback.
+    if (href) {
+      card.setAttribute("tabindex", "0");
+      card.addEventListener("click", function (e) {
+        if (e.target && e.target.closest("a")) return;
+        if (target === "_blank") {
+          window.open(href, "_blank", "noopener,noreferrer");
+        } else {
+          window.location.href = href;
+        }
+      });
+      card.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        if (target === "_blank") {
+          window.open(href, "_blank", "noopener,noreferrer");
+        } else {
+          window.location.href = href;
+        }
+      });
+    }
+
     card.addEventListener("mouseenter", function () {
       var n = 0;
       var id = setInterval(function () {
