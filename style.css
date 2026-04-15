@@ -728,6 +728,7 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   backdrop-filter: blur(12px);
   transition: var(--transition);
   cursor: pointer;
+  isolation: isolate;
 }
 
 .project-card::before {
@@ -846,6 +847,10 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   letter-spacing: 0.1em;
   color: var(--blue);
   transition: var(--transition);
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
 }
 
 .card-action:hover {
