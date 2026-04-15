@@ -448,6 +448,78 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
 }
 
+/* Per-character glitch wave (randomized in JS) */
+.glitch-char {
+  display: inline-block;
+  position: relative;
+  will-change: text-shadow;
+  clip-path: inset(0 0 0 0);
+}
+
+.glitch-char::before,
+.glitch-char::after {
+  content: attr(data-char);
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 45ms linear;
+  text-shadow: 0 0 0 transparent;
+}
+
+.glitch-char.is-glitch {
+  transform: translateX(var(--wx, 0px)) skewX(var(--wskew, 0deg)) scaleX(var(--wscale, 1));
+  clip-path: polygon(
+    0% var(--cut-top-l, 0%),
+    100% var(--cut-top-r, 0%),
+    100% calc(100% - var(--cut-bottom-r, 0%)),
+    0% calc(100% - var(--cut-bottom-l, 0%))
+  );
+  text-shadow:
+    0 0 calc(var(--glow-size, 8px) * 0.45) rgba(245, 230, 66, 0.25);
+  animation: charWarpJitter var(--warp-dur, 90ms) steps(2, end) 1;
+}
+
+.glitch-char.is-glitch::before {
+  opacity: var(--ghost-a, 0.75);
+  color: rgba(255, 43, 94, 0.75);
+  transform: translate(var(--sx1, -1px), var(--sy1, 0px));
+  text-shadow: 0 0 var(--blur1, 4px) rgba(255, 43, 94, 0.6);
+}
+
+.glitch-char.is-glitch::after {
+  opacity: var(--ghost-b, 0.65);
+  color: rgba(0, 212, 255, 0.75);
+  transform: translate(var(--sx2, 1px), var(--sy2, 0px));
+  text-shadow: 0 0 var(--blur2, 5px) rgba(0, 212, 255, 0.55);
+}
+
+@keyframes charWarpJitter {
+  0% {
+    transform: translateX(var(--wx, 0px)) skewX(var(--wskew, 0deg)) scaleX(var(--wscale, 1));
+  }
+  30% {
+    transform: translateX(calc(var(--wx, 0px) * -0.8)) skewX(calc(var(--wskew, 0deg) * -0.7)) scaleX(calc(var(--wscale, 1) + 0.04));
+  }
+  70% {
+    transform: translateX(calc(var(--wx, 0px) * 0.6)) skewX(calc(var(--wskew, 0deg) * 0.5)) scaleX(calc(var(--wscale, 1) - 0.03));
+  }
+  100% {
+    transform: translateX(var(--wx, 0px)) skewX(var(--wskew, 0deg)) scaleX(var(--wscale, 1));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glitch-char {
+    text-shadow: none;
+  }
+  .glitch-char::before,
+  .glitch-char::after {
+    opacity: 0;
+  }
+}
+
 /* Corner decorations */
 .corner {
   position: absolute;
@@ -856,6 +928,91 @@ a { color: inherit; text-decoration: none; text-transform: none; }
 .card-action:hover {
   text-shadow: var(--glow-blue);
   gap: 10px;
+}
+
+/* Only large content blocks use cyber hex frame */
+.scroll-section:not([data-section="0"]) .about-card,
+.scroll-section:not([data-section="0"]) .project-card,
+.scroll-section:not([data-section="0"]) .about-bio,
+.scroll-section:not([data-section="0"]) .contact-block {
+  --hex-tr: 14px;
+  --hex-bl: 14px;
+  --hex-br: 8px;
+  --hex-tl: 8px;
+  border-radius: 0;
+  clip-path: polygon(
+    var(--hex-tl) 0,
+    calc(100% - var(--hex-tr)) 0,
+    100% var(--hex-tr),
+    100% calc(100% - var(--hex-br)),
+    calc(100% - var(--hex-br)) 100%,
+    var(--hex-bl) 100%,
+    0 calc(100% - var(--hex-bl)),
+    0 var(--hex-tl)
+  );
+}
+
+.scroll-section:not([data-section="0"]) .about-bio {
+  overflow: hidden;
+}
+
+/* Controlled pseudo-random hex cuts for large cards */
+.about-grid .about-card:nth-child(1) {
+  --hex-tr: 16px;
+  --hex-bl: 10px;
+  --hex-br: 6px;
+  --hex-tl: 9px;
+}
+.about-grid .about-card:nth-child(2) {
+  --hex-tr: 11px;
+  --hex-bl: 16px;
+  --hex-br: 9px;
+  --hex-tl: 6px;
+}
+.about-grid .about-card:nth-child(3) {
+  --hex-tr: 14px;
+  --hex-bl: 12px;
+  --hex-br: 7px;
+  --hex-tl: 10px;
+}
+
+.project-grid .project-card:nth-child(1) {
+  --hex-tr: 17px;
+  --hex-bl: 10px;
+  --hex-br: 8px;
+  --hex-tl: 7px;
+}
+.project-grid .project-card:nth-child(2) {
+  --hex-tr: 12px;
+  --hex-bl: 17px;
+  --hex-br: 9px;
+  --hex-tl: 6px;
+}
+.project-grid .project-card:nth-child(3) {
+  --hex-tr: 15px;
+  --hex-bl: 11px;
+  --hex-br: 7px;
+  --hex-tl: 9px;
+}
+.project-grid .project-card:nth-child(4) {
+  --hex-tr: 10px;
+  --hex-bl: 15px;
+  --hex-br: 8px;
+  --hex-tl: 7px;
+}
+
+.about-bio {
+  --hex-tr: 13px;
+  --hex-bl: 16px;
+  --hex-br: 8px;
+  --hex-tl: 7px;
+}
+
+.contact-block {
+  --hex-tr: 16px;
+  --hex-bl: 12px;
+  --hex-br: 10px;
+  --hex-tl: 7px;
 }
 
 /* ===========================

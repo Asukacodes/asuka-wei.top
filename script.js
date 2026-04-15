@@ -524,6 +524,7 @@
   function startFullSweepTransition(fromIdx, toIdx) {
     isAnimating = true;
     var switched = false;
+    var showSweepStripe = false;
 
     var themeColors = [
       { r: 245, g: 230, b: 66 },  // hero: yellow
@@ -643,15 +644,17 @@
         ctx.fillRect(visibleStart, 0, visibleWidth, H);
         ctx.restore();
 
-        var edgeX = progress < coverRatio ? sweepFront : clearFront;
-        var edgeA = 0.58 * (1 - dissolveProgress * 0.7);
-        var grad = ctx.createLinearGradient(edgeX - 38, 0, edgeX + 18, 0);
-        grad.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0)");
-        grad.addColorStop(0.42, "rgba(" + Math.min(cr + 35, 255) + "," + Math.min(cg + 30, 255) + "," + Math.min(cb + 35, 255) + "," + (edgeA * 0.6) + ")");
-        grad.addColorStop(0.6, "rgba(255,255,255," + edgeA + ")");
-        grad.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
-        ctx.fillStyle = grad;
-        ctx.fillRect(edgeX - 38, 0, 56, H);
+        if (showSweepStripe) {
+          var edgeX = progress < coverRatio ? sweepFront : clearFront;
+          var edgeA = 0.58 * (1 - dissolveProgress * 0.7);
+          var grad = ctx.createLinearGradient(edgeX - 38, 0, edgeX + 18, 0);
+          grad.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+          grad.addColorStop(0.42, "rgba(" + Math.min(cr + 35, 255) + "," + Math.min(cg + 30, 255) + "," + Math.min(cb + 35, 255) + "," + (edgeA * 0.6) + ")");
+          grad.addColorStop(0.6, "rgba(255,255,255," + edgeA + ")");
+          grad.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+          ctx.fillStyle = grad;
+          ctx.fillRect(edgeX - 38, 0, 56, H);
+        }
       }
 
       if (progress < 1) {
@@ -796,12 +799,6 @@
   function startWiperTransition(targetIndex) {
     var prevSection = sections[currentSection];
     var nextSection = sections[targetIndex];
-    var bladeLen = Math.hypot(window.innerWidth, window.innerHeight) + 160;
-    var blade = document.createElement("div");
-    blade.className = "wiper-blade";
-    blade.style.width = bladeLen + "px";
-    blade.style.left = "0px";
-    blade.style.top = "50%";
 
     isAnimating = true;
     wiperState = {
@@ -813,13 +810,12 @@
       sweepRange: 284,
       prevSection: prevSection,
       nextSection: nextSection,
-      blade: blade,
+      blade: null,
       rafId: 0,
       lastTs: 0,
     };
 
     document.body.classList.add("is-wiper-transition");
-    document.body.appendChild(blade);
     nextSection.classList.remove("prev");
     nextSection.classList.add("active", "wiper-under");
     prevSection.classList.add("wiper-top");
@@ -1090,6 +1086,107 @@
     }
   }, { passive: true });
 
+})();
+
+
+/* ===========================
+   RANDOM TEXT GLITCH WAVE
+   =========================== */
+(function initTextGlitchWave() {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  var selectors = [
+    ".logo",
+    ".nav-link",
+    ".section-tag",
+    ".section-title",
+    ".title-line",
+    ".about-card h3",
+    ".project-card h3",
+    ".btn span",
+    ".card-action span"
+  ];
+
+  function shouldSkipNode(parentEl) {
+    if (!parentEl) return true;
+    var tag = parentEl.tagName;
+    return tag === "SCRIPT" || tag === "STYLE" || tag === "SVG" || tag === "PATH";
+  }
+
+  function wrapTextNode(node) {
+    if (!node || node.nodeType !== Node.TEXT_NODE) return;
+    var text = node.nodeValue;
+    if (!text || !text.trim()) return;
+    var parent = node.parentNode;
+    if (shouldSkipNode(parent)) return;
+
+    var frag = document.createDocumentFragment();
+    Array.from(text).forEach(function (ch) {
+      if (ch === " ") {
+        frag.appendChild(document.createTextNode(" "));
+        return;
+      }
+      var span = document.createElement("span");
+      span.className = "glitch-char";
+      span.textContent = ch;
+      span.setAttribute("data-char", ch);
+      frag.appendChild(span);
+    });
+    parent.replaceChild(frag, node);
+  }
+
+  function processElement(el) {
+    if (!el || el.dataset.glitchReady === "1") return;
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    var nodes = [];
+    var n;
+    while ((n = walker.nextNode())) nodes.push(n);
+    nodes.forEach(wrapTextNode);
+    el.dataset.glitchReady = "1";
+  }
+
+  var targets = document.querySelectorAll(selectors.join(","));
+  targets.forEach(processElement);
+
+  var chars = Array.from(document.querySelectorAll(".glitch-char"));
+  if (!chars.length) return;
+
+  function burstOnChar(ch) {
+    if (!ch) return;
+    var warpDuration = 80 + Math.floor(Math.random() * 150);
+    ch.style.setProperty("--sx1", ((Math.random() * 2.6 - 2.0).toFixed(2)) + "px");
+    ch.style.setProperty("--sy1", ((Math.random() * 1.8 - 0.9).toFixed(2)) + "px");
+    ch.style.setProperty("--sx2", ((Math.random() * 2.6 + 0.3).toFixed(2)) + "px");
+    ch.style.setProperty("--sy2", ((Math.random() * 1.8 - 0.9).toFixed(2)) + "px");
+    ch.style.setProperty("--blur1", (2 + Math.random() * 5).toFixed(2) + "px");
+    ch.style.setProperty("--blur2", (2 + Math.random() * 6).toFixed(2) + "px");
+    ch.style.setProperty("--ghost-a", (0.45 + Math.random() * 0.45).toFixed(2));
+    ch.style.setProperty("--ghost-b", (0.35 + Math.random() * 0.45).toFixed(2));
+    ch.style.setProperty("--glow-size", (4 + Math.random() * 9).toFixed(2) + "px");
+    ch.style.setProperty("--wx", ((Math.random() * 4.2 - 2.1).toFixed(2)) + "px");
+    ch.style.setProperty("--wskew", ((Math.random() * 18 - 9).toFixed(2)) + "deg");
+    ch.style.setProperty("--wscale", (0.9 + Math.random() * 0.24).toFixed(3));
+    ch.style.setProperty("--cut-top-l", (Math.random() * 14).toFixed(2) + "%");
+    ch.style.setProperty("--cut-top-r", (Math.random() * 14).toFixed(2) + "%");
+    ch.style.setProperty("--cut-bottom-l", (Math.random() * 16).toFixed(2) + "%");
+    ch.style.setProperty("--cut-bottom-r", (Math.random() * 16).toFixed(2) + "%");
+    ch.style.setProperty("--warp-dur", warpDuration + "ms");
+    ch.classList.add("is-glitch");
+    setTimeout(function () {
+      ch.classList.remove("is-glitch");
+    }, warpDuration);
+  }
+
+  function pulse() {
+    if (!chars.length) return;
+    var burstCount = 1 + Math.floor(Math.random() * 4);
+    for (var i = 0; i < burstCount; i++) {
+      burstOnChar(chars[(Math.random() * chars.length) | 0]);
+    }
+    setTimeout(pulse, 65 + Math.floor(Math.random() * 230));
+  }
+
+  pulse();
 })();
 
 
