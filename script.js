@@ -1090,6 +1090,100 @@
 
 
 /* ===========================
+   HERO TITLE RANDOM SLICES
+   =========================== */
+(function initHeroSliceRandom() {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var lines = Array.from(document.querySelectorAll(".hero-title .title-line"));
+  if (!lines.length) return;
+
+  function randomizeSlice(line) {
+    if (!line) return;
+    if (Math.random() < 0.32) {
+      line.style.setProperty("--slice-opacity", "0");
+      line.classList.remove("is-slice-hit");
+      return;
+    }
+
+    var top = Math.random() * 82;
+    var height = 8 + Math.random() * 30;
+    if (top + height > 96) top = 96 - height;
+    var bottom = 100 - (top + height);
+    var shift = (Math.random() * 8 - 4).toFixed(2) + "px";
+    var opacity = (0.16 + Math.random() * 0.42).toFixed(2);
+    var dur = 90 + Math.floor(Math.random() * 140);
+    var colors = [
+      "rgba(0,212,255,0.52)",
+      "rgba(255,43,94,0.46)",
+      "rgba(245,230,66,0.42)"
+    ];
+
+    line.style.setProperty("--slice-top", top.toFixed(2) + "%");
+    line.style.setProperty("--slice-bottom", bottom.toFixed(2) + "%");
+    line.style.setProperty("--slice-shift", shift);
+    line.style.setProperty("--slice-opacity", opacity);
+    line.style.setProperty("--slice-color", colors[(Math.random() * colors.length) | 0]);
+    line.style.setProperty("--slice-dur", dur + "ms");
+    line.style.setProperty("--slice-j1", ((Math.random() * 4.4 - 2.2).toFixed(2)) + "px");
+    line.style.setProperty("--slice-j2", ((Math.random() * 5.2 - 2.6).toFixed(2)) + "px");
+    line.style.setProperty("--slice-j3", ((Math.random() * 3.6 - 1.8).toFixed(2)) + "px");
+    line.style.setProperty("--slice-sk1", ((Math.random() * 9 - 4.5).toFixed(2)) + "deg");
+    line.style.setProperty("--slice-sk2", ((Math.random() * 8 - 4).toFixed(2)) + "deg");
+    line.style.setProperty("--slice-sk3", ((Math.random() * 6 - 3).toFixed(2)) + "deg");
+
+    // Restart one-shot wobble so only active slice region jitters.
+    line.classList.remove("is-slice-hit");
+    void line.offsetWidth;
+    line.classList.add("is-slice-hit");
+  }
+
+  function pulse() {
+    for (var i = 0; i < lines.length; i++) {
+      if (Math.random() < 0.72) randomizeSlice(lines[i]);
+    }
+    setTimeout(pulse, 80 + Math.floor(Math.random() * 220));
+  }
+
+  pulse();
+})();
+
+
+/* ===========================
+   HERO TITLE LETTER MOTION
+   =========================== */
+(function initHeroCharMotion() {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var heroChars = Array.from(document.querySelectorAll(".hero-title .hero-char"));
+  if (!heroChars.length) return;
+
+  function joltChar(ch) {
+    if (!ch) return;
+    var dur = 90 + Math.floor(Math.random() * 140);
+    ch.style.setProperty("--hero-jolt-dur", dur + "ms");
+    ch.style.setProperty("--hero-jx1", ((Math.random() * 4.4 - 2.2).toFixed(2)) + "px");
+    ch.style.setProperty("--hero-jx2", ((Math.random() * 4.4 - 2.2).toFixed(2)) + "px");
+    ch.style.setProperty("--hero-sk1", ((Math.random() * 8 - 4).toFixed(2)) + "deg");
+    ch.style.setProperty("--hero-sk2", ((Math.random() * 8 - 4).toFixed(2)) + "deg");
+
+    ch.classList.remove("is-hero-jolt");
+    void ch.offsetWidth;
+    ch.classList.add("is-hero-jolt");
+  }
+
+  function pulse() {
+    if (!heroChars.length) return;
+    var count = 1 + Math.floor(Math.random() * 3);
+    for (var i = 0; i < count; i++) {
+      joltChar(heroChars[(Math.random() * heroChars.length) | 0]);
+    }
+    setTimeout(pulse, 120 + Math.floor(Math.random() * 260));
+  }
+
+  pulse();
+})();
+
+
+/* ===========================
    RANDOM TEXT GLITCH WAVE
    =========================== */
 (function initTextGlitchWave() {
@@ -1100,7 +1194,6 @@
     ".nav-link",
     ".section-tag",
     ".section-title",
-    ".title-line",
     ".about-card h3",
     ".project-card h3",
     ".btn span",
