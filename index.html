@@ -1,167 +1,336 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Asuka Wei | 个人站</title>
+    <title>Asuka Wei | Personal Site</title>
     <meta
       name="description"
-      content="Asuka Wei 的个人网站，包含视频、文章、笔记和开源项目。"
+      content="Asuka Wei — Technical Animator, Developer, Creative Technologist."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Teko:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <!-- ASCII Matrix -->
+    <div class="matrix-wrapper" aria-hidden="true">
+      <pre id="matrix-left" class="matrix-col matrix-left"></pre>
+      <pre id="matrix-right" class="matrix-col matrix-right"></pre>
+    </div>
+
+    <!-- Scanlines -->
+    <div class="scanlines"></div>
+
+    <!-- Header -->
     <header class="site-header">
       <div class="container nav">
-        <a class="logo" href="#top">Asuka Wei</a>
+        <a class="logo" href="#top">
+          <span class="logo-bracket">&gt;</span> Asuka<span class="logo-dot">_</span>Wei<span class="logo-cursor">_</span>
+        </a>
         <nav>
           <ul class="nav-links">
-            <li><a href="#about">关于</a></li>
-            <li><a href="#projects">项目</a></li>
-            <li><a href="#links">链接</a></li>
-            <li><a href="#contact">联系</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#projects" class="nav-link">Projects</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
           </ul>
         </nav>
-        <button id="themeToggle" class="theme-toggle" type="button" aria-label="切换主题">
-          主题
-        </button>
+        <div class="nav-status">
+          <span class="status-pill">
+            <span class="pill-dot"></span> ONLINE
+          </span>
+        </div>
       </div>
     </header>
 
-    <main id="top">
-      <section class="hero container">
-        <p class="kicker">Technical Animator · Developer</p>
-        <h1>Asuka Wei 的个人空间</h1>
-        <p class="hero-copy">
-          这里收录了我的视频内容、技术文章、个人笔记和开源项目。后续会持续更新更多创作与技术实践。
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#links">查看链接</a>
-          <a class="btn btn-secondary" href="https://github.com/Asukacodes" target="_blank" rel="noreferrer">访问 GitHub</a>
+    <!-- Scroll Container -->
+    <div class="scroll-container" id="scrollContainer">
+
+      <!-- ===== HERO ===== -->
+      <section class="scroll-section hero-section" data-section="0">
+        <div class="hero-inner">
+          <div class="hero-tag reveal-item" data-reveal="0">
+            <span class="tag-slash">// </span>
+            <span class="tag-text">SYSTEM v2.077 — ACTIVE</span>
+          </div>
+
+          <h1 class="hero-title">
+            <span class="title-line" data-text="ASUKA">ASUKA</span>
+            <span class="title-line accent" data-text="WEI">WEI</span>
+          </h1>
+
+          <div class="hero-divider reveal-item" data-reveal="1">
+            <span class="divider-line"></span>
+            <span class="divider-text">TECHNICAL ANIMATOR · DEVELOPER · CREATIVE CODER</span>
+            <span class="divider-line"></span>
+          </div>
+
+          <p class="hero-desc reveal-item" data-reveal="2">
+            Focusing on Technical Animation, real-time pipelines, and creative tech.<br />
+            This is where I share videos, articles, notes, and open-source work.
+          </p>
+
+          <div class="hero-actions reveal-item" data-reveal="3">
+            <a class="btn btn-primary" href="#projects">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
+              VIEW PROJECTS
+            </a>
+            <a class="btn btn-outline" href="https://github.com/Asukacodes" target="_blank" rel="noreferrer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              GITHUB
+            </a>
+          </div>
+
+          <div class="hero-scroll reveal-item" data-reveal="4">
+            <span class="scroll-line"></span>
+            <span class="scroll-label">SCROLL</span>
+          </div>
+        </div>
+
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+
+        <div class="section-dots">
+          <span class="dot active" data-target="0"></span>
+          <span class="dot" data-target="1"></span>
+          <span class="dot" data-target="2"></span>
+          <span class="dot" data-target="3"></span>
+        </div>
+        <div class="section-counter">
+          <span class="counter-current">01</span>
+          <span class="counter-sep">/</span>
+          <span class="counter-total">04</span>
         </div>
       </section>
 
-      <section id="about" class="section container">
-        <h2>关于我</h2>
-        <p>
-          我是 Asuka，目前专注于技术动画、实时工具链和创意技术实践。这个站点是我对外的统一入口，用来沉淀作品与思考。
-        </p>
-      </section>
-
-      <section id="projects" class="section container">
-        <div class="section-head">
-          <h2>项目与内容</h2>
-          <p>以下入口已按你的真实地址配置完成。</p>
+      <!-- ===== ABOUT ===== -->
+      <section id="about" class="scroll-section about-section" data-section="1">
+        <div class="container section-inner">
+          <div class="section-header reveal-item" data-reveal="0">
+            <span class="section-tag">// 01 — ABOUT</span>
+            <h2 class="section-title">About Me</h2>
+          </div>
+          <div class="about-grid reveal-item" data-reveal="1">
+            <div class="about-card">
+              <div class="card-number">01</div>
+              <h3>TECH ANIM</h3>
+              <p>Technical Animation · Real-time Pipeline · Pipeline Automation</p>
+              <div class="card-bar"></div>
+            </div>
+            <div class="about-card">
+              <div class="card-number">02</div>
+              <h3>DEVELOPER</h3>
+              <p>Full-Stack Dev · Toolchain · Scripts &amp; Plugins</p>
+              <div class="card-bar"></div>
+            </div>
+            <div class="about-card">
+              <div class="card-number">03</div>
+              <h3>CREATOR</h3>
+              <p>Digital Art · Interactive Installations · Creative Tech Fusion</p>
+              <div class="card-bar"></div>
+            </div>
+          </div>
+          <div class="about-bio reveal-item" data-reveal="2">
+            <div class="bio-hex"><span>&gt;</span></div>
+            <p>I'm <span class="hl">Asuka</span>, focused on <strong>Technical Animation</strong>, <strong>Real-time Pipelines</strong>, and <strong>Creative Technology</strong>. This site is my unified hub for showcasing work and sharing ideas.</p>
+          </div>
         </div>
-        <div class="grid">
-          <article class="card">
-            <h3>Bilibili 视频</h3>
-            <p>发布视频内容与动态更新。</p>
-            <a href="https://space.bilibili.com/441116886" target="_blank" rel="noreferrer">立即访问</a>
-          </article>
-          <article class="card">
-            <h3>知乎文章</h3>
-            <p>记录观点、方法与经验总结。</p>
-            <a href="https://www.zhihu.com/people/wei-wu-hen-39/posts" target="_blank" rel="noreferrer">立即访问</a>
-          </article>
-          <article class="card">
-            <h3>Notion 笔记</h3>
-            <p>公开文档、清单与持续整理的资料。</p>
-            <a href="https://neighborly-jaborosa-f48.notion.site/27baa5a50eb180b78134f2553d3bf486?v=290aa5a50eb180cbb324000c5c00a3f9&pvs=74" target="_blank" rel="noreferrer">立即访问</a>
-          </article>
+
+        <div class="section-dots">
+          <span class="dot" data-target="0"></span>
+          <span class="dot active" data-target="1"></span>
+          <span class="dot" data-target="2"></span>
+          <span class="dot" data-target="3"></span>
         </div>
-      </section>
-
-      <section id="links" class="section container">
-        <h2>全部链接</h2>
-        <ul class="social-list">
-          <li class="social-item">
-            <a href="https://space.bilibili.com/441116886" target="_blank" rel="noreferrer">Bilibili</a>
-            <button class="copy-btn" type="button" data-copy-url="https://space.bilibili.com/441116886">
-              复制
-            </button>
-          </li>
-          <li class="social-item">
-            <a href="https://www.zhihu.com/people/wei-wu-hen-39/posts" target="_blank" rel="noreferrer">Zhihu</a>
-            <button class="copy-btn" type="button" data-copy-url="https://www.zhihu.com/people/wei-wu-hen-39/posts">
-              复制
-            </button>
-          </li>
-          <li class="social-item">
-            <a href="https://neighborly-jaborosa-f48.notion.site/27baa5a50eb180b78134f2553d3bf486?v=290aa5a50eb180cbb324000c5c00a3f9&pvs=74" target="_blank" rel="noreferrer">Notion</a>
-            <button class="copy-btn" type="button" data-copy-url="https://neighborly-jaborosa-f48.notion.site/27baa5a50eb180b78134f2553d3bf486?v=290aa5a50eb180cbb324000c5c00a3f9&pvs=74">
-              复制
-            </button>
-          </li>
-          <li class="social-item">
-            <a href="https://github.com/Asukacodes" target="_blank" rel="noreferrer">GitHub</a>
-            <button class="copy-btn" type="button" data-copy-url="https://github.com/Asukacodes">
-              复制
-            </button>
-          </li>
-        </ul>
-        <p id="copyStatus" class="copy-status" aria-live="polite"></p>
-      </section>
-
-      <section class="section container">
-        <h2>二维码</h2>
-        <p>可直接扫码访问你的外部平台主页。</p>
-        <div class="qr-grid">
-          <article class="qr-card">
-            <img
-              class="qr-image"
-              data-qr-url="https://space.bilibili.com/441116886"
-              alt="Bilibili 二维码"
-            />
-            <h3>Bilibili</h3>
-          </article>
-          <article class="qr-card">
-            <img
-              class="qr-image"
-              data-qr-url="https://www.zhihu.com/people/wei-wu-hen-39/posts"
-              alt="Zhihu 二维码"
-            />
-            <h3>Zhihu</h3>
-          </article>
-          <article class="qr-card">
-            <img
-              class="qr-image"
-              data-qr-url="https://neighborly-jaborosa-f48.notion.site/27baa5a50eb180b78134f2553d3bf486?v=290aa5a50eb180cbb324000c5c00a3f9&pvs=74"
-              alt="Notion 二维码"
-            />
-            <h3>Notion</h3>
-          </article>
-          <article class="qr-card">
-            <img
-              class="qr-image"
-              data-qr-url="https://github.com/Asukacodes"
-              alt="GitHub 二维码"
-            />
-            <h3>GitHub</h3>
-          </article>
+        <div class="section-counter">
+          <span class="counter-current">02</span>
+          <span class="counter-sep">/</span>
+          <span class="counter-total">04</span>
         </div>
       </section>
 
-      <section id="contact" class="section container">
-        <h2>联系我</h2>
-        <p>
-          你可以通过 GitHub 联系我：
-          <a href="https://github.com/Asukacodes" target="_blank" rel="noreferrer">@Asukacodes</a>
-        </p>
-      </section>
-    </main>
+      <!-- ===== PROJECTS ===== -->
+      <section id="projects" class="scroll-section projects-section" data-section="2">
+        <div class="container section-inner">
+          <div class="section-header reveal-item" data-reveal="0">
+            <span class="section-tag">// 02 — PROJECTS</span>
+            <h2 class="section-title">Projects &amp; Content</h2>
+          </div>
+          <div class="project-grid">
+            <article class="project-card reveal-item" data-reveal="1">
+              <div class="card-header">
+                <div class="card-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.6 7.7A2 2 0 0 0 15 7H9.3A3.9 3.9 0 0 0 5 10.7V21h2v-6h2v6h2v-6h2v6h2V10.8a1.8 1.8 0 0 0-.4-3.1z"/>
+                  </svg>
+                </div>
+                <span class="card-status">ACTIVE</span>
+              </div>
+              <h3>BILIBILI</h3>
+              <p>Video content and updates covering technical animation and creative production.</p>
+              <div class="card-tags">
+                <span class="tag"># VIDEO</span>
+                <span class="tag"># ANIMATION</span>
+              </div>
+              <a href="https://space.bilibili.com/441116886" target="_blank" rel="noreferrer" class="card-action">
+                <span>ACCESS</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M7 17L17 7M7 7h10v10"/>
+                </svg>
+              </a>
+              <div class="card-scan"></div>
+            </article>
 
-    <footer class="site-footer">
-      <div class="container">
-        <p>© <span id="year"></span> Asuka Wei. All rights reserved.</p>
-      </div>
-    </footer>
+            <article class="project-card reveal-item" data-reveal="2">
+              <div class="card-header">
+                <div class="card-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                  </svg>
+                </div>
+                <span class="card-status">ACTIVE</span>
+              </div>
+              <h3>ZHIHU</h3>
+              <p>Perspectives, methods, and deep technical content — articles and insights.</p>
+              <div class="card-tags">
+                <span class="tag"># ARTICLES</span>
+                <span class="tag"># TECH</span>
+              </div>
+              <a href="https://www.zhihu.com/people/wei-wu-hen-39/posts" target="_blank" rel="noreferrer" class="card-action">
+                <span>ACCESS</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M7 17L17 7M7 7h10v10"/>
+                </svg>
+              </a>
+              <div class="card-scan"></div>
+            </article>
+
+            <article class="project-card reveal-item" data-reveal="3">
+              <div class="card-header">
+                <div class="card-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5zm0 8a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6zm12 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-6z"/>
+                  </svg>
+                </div>
+                <span class="card-status">ACTIVE</span>
+              </div>
+              <h3>NOTION</h3>
+              <p>Public documents, notes, and a continuously organized knowledge base.</p>
+              <div class="card-tags">
+                <span class="tag"># NOTES</span>
+                <span class="tag"># KNOWLEDGE</span>
+              </div>
+              <a href="https://neighborly-jaborosa-f48.notion.site/27baa5a50eb180b78134f2553d3bf486?v=290aa5a50eb180cbb324000c5c00a3f9&pvs=74" target="_blank" rel="noreferrer" class="card-action">
+                <span>ACCESS</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M7 17L17 7M7 7h10v10"/>
+                </svg>
+              </a>
+              <div class="card-scan"></div>
+            </article>
+
+            <article class="project-card reveal-item" data-reveal="4">
+              <div class="card-header">
+                <div class="card-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                </div>
+                <span class="card-status">ACTIVE</span>
+              </div>
+              <h3>GITHUB</h3>
+              <p>Open-source projects and code repositories — all technical practice.</p>
+              <div class="card-tags">
+                <span class="tag"># OPEN SOURCE</span>
+                <span class="tag"># CODE</span>
+              </div>
+              <a href="https://github.com/Asukacodes" target="_blank" rel="noreferrer" class="card-action">
+                <span>ACCESS</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M7 17L17 7M7 7h10v10"/>
+                </svg>
+              </a>
+              <div class="card-scan"></div>
+            </article>
+          </div>
+        </div>
+
+        <div class="section-dots">
+          <span class="dot" data-target="0"></span>
+          <span class="dot" data-target="1"></span>
+          <span class="dot active" data-target="2"></span>
+          <span class="dot" data-target="3"></span>
+        </div>
+        <div class="section-counter">
+          <span class="counter-current">03</span>
+          <span class="counter-sep">/</span>
+          <span class="counter-total">04</span>
+        </div>
+      </section>
+
+      <!-- ===== CONTACT ===== -->
+      <section id="contact" class="scroll-section contact-section" data-section="3">
+        <div class="container section-inner">
+          <div class="section-header reveal-item" data-reveal="0">
+            <span class="section-tag">// 03 — CONTACT</span>
+            <h2 class="section-title">Get in Touch</h2>
+          </div>
+          <div class="contact-block reveal-item" data-reveal="1">
+            <div class="contact-lines">
+              <div class="contact-line"></div>
+              <div class="contact-line"></div>
+              <div class="contact-line"></div>
+            </div>
+            <p>Find me on GitHub, or visit my platform profiles below.</p>
+            <a href="https://github.com/Asukacodes" target="_blank" rel="noreferrer" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              @Asukacodes
+            </a>
+            <div class="contact-cmd">
+              <span class="cmd-prompt">&gt;</span>
+              <span class="cmd-text">Open for tech &amp; creative collaboration</span>
+              <span class="cmd-cursor">_</span>
+            </div>
+          </div>
+        </div>
+
+        <footer class="site-footer">
+          <div class="container footer-inner">
+            <span class="footer-cmd">&gt; asukawei.exe — 2024 — ALL SYSTEMS GO</span>
+            <div class="footer-right">
+              <span class="footer-dot"></span>
+              <span>SYSTEM NOMINAL</span>
+            </div>
+          </div>
+        </footer>
+
+        <div class="section-dots">
+          <span class="dot" data-target="0"></span>
+          <span class="dot" data-target="1"></span>
+          <span class="dot" data-target="2"></span>
+          <span class="dot active" data-target="3"></span>
+        </div>
+        <div class="section-counter">
+          <span class="counter-current">04</span>
+          <span class="counter-sep">/</span>
+          <span class="counter-total">04</span>
+        </div>
+      </section>
+
+    </div>
 
     <script src="./script.js"></script>
   </body>
