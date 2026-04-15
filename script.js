@@ -1060,16 +1060,33 @@
 
   // ---- Touch ----
   var touchStartY = 0, touchStartTime = 0;
+  var touchStartSection = null;
   document.addEventListener("touchstart", function (e) {
     touchStartY = e.touches[0].clientY;
     touchStartTime = Date.now();
+    touchStartSection = document.querySelector(".scroll-section.active");
   }, { passive: true });
   document.addEventListener("touchend", function (e) {
     var deltaY = touchStartY - e.changedTouches[0].clientY;
     var deltaTime = Date.now() - touchStartTime;
-    if (Math.abs(deltaY) > 40 && deltaTime < 500) {
-      if (deltaY > 0) goToSection(currentSection + 1);
-      else goToSection(currentSection - 1);
+    if (Math.abs(deltaY) <= 40 || deltaTime >= 500) return;
+
+    // On mobile, allow reading long content first.
+    // Section switching happens only at top/bottom edges.
+    if (touchStartSection) {
+      var canScroll = touchStartSection.scrollHeight > touchStartSection.clientHeight + 2;
+      if (canScroll) {
+        var atTop = touchStartSection.scrollTop <= 4;
+        var atBottom = touchStartSection.scrollTop + touchStartSection.clientHeight >= touchStartSection.scrollHeight - 4;
+        if (deltaY > 0 && !atBottom) return;
+        if (deltaY < 0 && !atTop) return;
+      }
+    }
+
+    if (deltaY > 0) {
+      goToSection(currentSection + 1);
+    } else {
+      goToSection(currentSection - 1);
     }
   }, { passive: true });
 
