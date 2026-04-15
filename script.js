@@ -238,16 +238,16 @@
     var offsetX = seed.offsetX + (x / seed.scaleX);
     var offsetY = seed.offsetY + (y / seed.scaleY);
 
-    var firstX = perlin(offsetX, offsetY, 4);
-    var firstY = perlin(offsetX + animTimer * seed.firstSpeedY, offsetY + animTimer * seed.firstSpeedY, 4);
+    var firstX = perlin(offsetX, offsetY, 3);
+    var firstY = perlin(offsetX + animTimer * seed.firstSpeedY, offsetY + animTimer * seed.firstSpeedY, 3);
 
     var secondX = perlin(
       offsetX + seed.secondFreqX * firstX + animTimer * seed.secondSpeedX,
-      offsetY + seed.secondFreqX * firstY + animTimer * seed.secondSpeedX, 4);
+      offsetY + seed.secondFreqX * firstY + animTimer * seed.secondSpeedX, 3);
 
     var secondY = perlin(
       offsetX + seed.secondFreqY * firstX + animTimer * seed.secondSpeedY,
-      offsetY + seed.secondFreqY * firstY + animTimer * seed.secondSpeedY, 4);
+      offsetY + seed.secondFreqY * firstY + animTimer * seed.secondSpeedY, 3);
 
     var finalX = offsetX + firstX * seed.firstMixX + secondX * seed.secondMixX;
     var finalY = offsetY + firstY * seed.firstMixY + secondY * seed.secondMixY;
@@ -263,7 +263,7 @@
 
     var opacity = perlin(
       seed.opacityMix0 * finalX + seed.opacityMix1 * firstX,
-      seed.opacityMix2 * finalY + seed.opacityMix3 * secondY, 4);
+      seed.opacityMix2 * finalY + seed.opacityMix3 * secondY, 3);
 
     var dark = seed.dark || { r: 50, g: 45, b: 10 };
     cr = lerp(dark.r / 255, cr, opacity * 0.7);
@@ -338,18 +338,28 @@
   init();
 
   var lastTime = 0;
+  var frameCount = 0;
   function loop(ts) {
+    // Pause animation when tab is hidden
+    if (document.hidden) {
+      lastTime = 0;
+      requestAnimationFrame(loop);
+      return;
+    }
     var delta = Math.min((ts - lastTime) / 1000, 0.05);
     lastTime = ts;
     animTimer += delta;
 
-    updateSeedDataTarget("asukawei-left", currentTheme);
-    updateSeedDataCurrent();
-    updateBoard(leftChars, leftColors, leftCols, leftRows);
+    // Only update board every 2nd frame to reduce CPU load
+    if (++frameCount % 2 === 0) {
+      updateSeedDataTarget("asukawei-left", currentTheme);
+      updateSeedDataCurrent();
+      updateBoard(leftChars, leftColors, leftCols, leftRows);
 
-    updateSeedDataTarget("asukawei-right", currentTheme);
-    updateSeedDataCurrent();
-    updateBoard(rightChars, rightColors, rightCols, rightRows);
+      updateSeedDataTarget("asukawei-right", currentTheme);
+      updateSeedDataCurrent();
+      updateBoard(rightChars, rightColors, rightCols, rightRows);
+    }
 
     requestAnimationFrame(loop);
   }
