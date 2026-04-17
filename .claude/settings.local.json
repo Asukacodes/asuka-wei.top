@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh api:*)",
+      "Bash(gh pages:*)",
+      "Bash(curl:*)",
+      "Bash(nslookup asuka-wei.top)",
+      "Bash(gh run:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh browse:*)",
+      "Bash(python3 -c \"import sys,json; t=json.load\\(sys.stdin\\); print\\(''''\\\\n''''.join\\(f[''''path''''] for f in t[''''tree'''']\\)\\)\")",
+      "Bash(start:*)",
+      "Bash(wc:*)",
+      "Bash(node --check script.js)",
+      "Bash(node --check style.css)",
+      "Bash(node:*)"
+    ]
+  }
+}

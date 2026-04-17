@@ -1090,7 +1090,145 @@
 
 
 /* ===========================
-   HERO TITLE RANDOM SLICES
+   HERO TITLE GLITCH — PERIODIC BIG BURST
+   Screen shake + flash + title distortion
+   =========================== */
+(function initHeroGlitchBurst() {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var heroTitle = document.querySelector(".hero-title");
+  var titleLines = Array.from(document.querySelectorAll(".hero-title .title-line"));
+  if (!heroTitle || !titleLines.length) return;
+
+  // Create particle container inside hero-inner
+  var heroInner = document.querySelector(".hero-inner");
+  if (heroInner) {
+    var particleContainer = document.createElement("div");
+    particleContainer.className = "title-glitch-particles";
+    particleContainer.id = "titleParticles";
+    particleInner = heroInner.insertBefore(particleContainer, heroInner.firstChild);
+  }
+
+  var glitchChars = "01XYxX@#$%&*?!^+-<>/\\|~`";
+  var lastBurstTime = 0;
+  var burstInterval = 2200;
+  var minBurstInterval = 1400;
+
+  function getParticleGlyph() {
+    return glitchChars[(Math.random() * glitchChars.length) | 0];
+  }
+
+  function spawnParticle() {
+    if (!particleContainer) return;
+    var p = document.createElement("span");
+    p.className = "title-glitch-particle";
+    p.textContent = getParticleGlyph();
+
+    var dur = 250 + Math.random() * 350;
+    var delay = Math.random() * 80;
+    var xBase = Math.random() * 100;
+    var yBase = Math.random() * 100;
+    var isLeft = Math.random() < 0.5;
+    var xOff = (isLeft ? -1 : 1) * (5 + Math.random() * 30);
+    var yOff = (Math.random() - 0.5) * 40;
+    var skew = (Math.random() - 0.5) * 30;
+
+    p.style.cssText = [
+      "left:" + xBase + "%;",
+      "top:" + yBase + "%;",
+      "--p-dur:" + dur + "ms;",
+      "--p-delay:" + delay + "ms;",
+      "--p-x1:" + xOff * 0.4 + "px;",
+      "--p-y1:" + yOff * 0.3 + "px;",
+      "--p-sk1:" + skew * 0.5 + "deg;",
+      "--p-x2:" + (-xOff * 0.7) + "px;",
+      "--p-y2:" + (-yOff * 0.4) + "px;",
+      "--p-sk2:" + (-skew * 0.6) + "deg;",
+      "--p-x3:" + xOff * 0.5 + "px;",
+      "--p-y3:" + yOff * 0.5 + "px;",
+      "--p-sk3:" + skew * 0.3 + "deg;",
+      "--p-x4:" + (-xOff * 0.3) + "px;",
+      "--p-y4:" + (-yOff * 0.2) + "px;",
+      "--p-sk4:" + (-skew * 0.2) + "deg;",
+      "--p-x5:" + 0 + "px;",
+      "--p-y5:" + yOff * 0.8 + "px;"
+    ].join("");
+
+    particleContainer.appendChild(p);
+    setTimeout(function () {
+      if (p.parentNode) p.parentNode.removeChild(p);
+    }, dur + delay + 50);
+  }
+
+  function burstParticles() {
+    var count = 8 + Math.floor(Math.random() * 12);
+    for (var i = 0; i < count; i++) {
+      setTimeout(spawnParticle, Math.random() * 120);
+    }
+  }
+
+  function flashGlitchOverlay() {
+    var flash = document.createElement("div");
+    flash.className = "hero-title-glitch-flash";
+    document.body.appendChild(flash);
+    setTimeout(function () {
+      if (flash.parentNode) flash.parentNode.removeChild(flash);
+    }, 350);
+  }
+
+  function bigGlitch() {
+    // Flash overlay
+    flashGlitchOverlay();
+
+    // Big burst on all title lines
+    titleLines.forEach(function (line) {
+      line.classList.remove("is-glitch-burst");
+      void line.offsetWidth;
+      line.classList.add("is-glitch-burst");
+      setTimeout(function () {
+        line.classList.remove("is-glitch-burst");
+      }, 500);
+    });
+
+    // Particle explosion
+    burstParticles();
+
+    // Screen shake
+    document.body.style.transition = "none";
+    var shakeFrames = 0;
+    var shakeIntensity = 3 + Math.random() * 4;
+    var shakeId = setInterval(function () {
+      var x = (Math.random() - 0.5) * shakeIntensity * (1 - shakeFrames / 12);
+      var y = (Math.random() - 0.5) * shakeIntensity * (1 - shakeFrames / 12);
+      document.body.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
+      shakeFrames++;
+      if (shakeFrames >= 12) {
+        clearInterval(shakeId);
+        document.body.style.transform = "";
+        document.body.style.transition = "";
+      }
+    }, 25);
+  }
+
+  function scheduleNext() {
+    var jitter = Math.random() * (burstInterval - minBurstInterval);
+    var delay = minBurstInterval + jitter;
+    setTimeout(function () {
+      var now = performance.now();
+      // Only burst if hero section is visible
+      var heroSection = document.querySelector(".scroll-section.active");
+      if (heroSection && heroSection.dataset.section === "0") {
+        bigGlitch();
+      }
+      scheduleNext();
+    }, delay);
+  }
+
+  scheduleNext();
+})();
+
+
+/* ===========================
+   HERO TITLE RANDOM SLICES — ENHANCED
    =========================== */
 (function initHeroSliceRandom() {
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1099,23 +1237,26 @@
 
   function randomizeSlice(line) {
     if (!line) return;
-    if (Math.random() < 0.32) {
+    if (Math.random() < 0.28) {
       line.style.setProperty("--slice-opacity", "0");
       line.classList.remove("is-slice-hit");
       return;
     }
 
-    var top = Math.random() * 82;
-    var height = 8 + Math.random() * 30;
-    if (top + height > 96) top = 96 - height;
+    // More dramatic slice parameters
+    var top = Math.random() * 85;
+    var height = 10 + Math.random() * 38;
+    if (top + height > 95) top = 95 - height;
     var bottom = 100 - (top + height);
-    var shift = (Math.random() * 8 - 4).toFixed(2) + "px";
-    var opacity = (0.16 + Math.random() * 0.42).toFixed(2);
-    var dur = 90 + Math.floor(Math.random() * 140);
+    var shift = (Math.random() * 12 - 6).toFixed(2) + "px";
+    var opacity = (0.22 + Math.random() * 0.55).toFixed(2);
+    var dur = 80 + Math.floor(Math.random() * 160);
     var colors = [
-      "rgba(0,212,255,0.52)",
-      "rgba(255,43,94,0.46)",
-      "rgba(245,230,66,0.42)"
+      "rgba(0,212,255,0.7)",
+      "rgba(255,43,94,0.65)",
+      "rgba(245,230,66,0.6)",
+      "rgba(255,200,100,0.5)",
+      "rgba(0,255,140,0.45)"
     ];
 
     line.style.setProperty("--slice-top", top.toFixed(2) + "%");
@@ -1124,14 +1265,13 @@
     line.style.setProperty("--slice-opacity", opacity);
     line.style.setProperty("--slice-color", colors[(Math.random() * colors.length) | 0]);
     line.style.setProperty("--slice-dur", dur + "ms");
-    line.style.setProperty("--slice-j1", ((Math.random() * 4.4 - 2.2).toFixed(2)) + "px");
-    line.style.setProperty("--slice-j2", ((Math.random() * 5.2 - 2.6).toFixed(2)) + "px");
-    line.style.setProperty("--slice-j3", ((Math.random() * 3.6 - 1.8).toFixed(2)) + "px");
-    line.style.setProperty("--slice-sk1", ((Math.random() * 9 - 4.5).toFixed(2)) + "deg");
-    line.style.setProperty("--slice-sk2", ((Math.random() * 8 - 4).toFixed(2)) + "deg");
-    line.style.setProperty("--slice-sk3", ((Math.random() * 6 - 3).toFixed(2)) + "deg");
+    line.style.setProperty("--slice-j1", ((Math.random() * 6 - 3).toFixed(2)) + "px");
+    line.style.setProperty("--slice-j2", ((Math.random() * 7 - 3.5).toFixed(2)) + "px");
+    line.style.setProperty("--slice-j3", ((Math.random() * 5 - 2.5).toFixed(2)) + "px");
+    line.style.setProperty("--slice-sk1", ((Math.random() * 12 - 6).toFixed(2)) + "deg");
+    line.style.setProperty("--slice-sk2", ((Math.random() * 10 - 5).toFixed(2)) + "deg");
+    line.style.setProperty("--slice-sk3", ((Math.random() * 8 - 4).toFixed(2)) + "deg");
 
-    // Restart one-shot wobble so only active slice region jitters.
     line.classList.remove("is-slice-hit");
     void line.offsetWidth;
     line.classList.add("is-slice-hit");
@@ -1139,9 +1279,9 @@
 
   function pulse() {
     for (var i = 0; i < lines.length; i++) {
-      if (Math.random() < 0.72) randomizeSlice(lines[i]);
+      if (Math.random() < 0.78) randomizeSlice(lines[i]);
     }
-    setTimeout(pulse, 80 + Math.floor(Math.random() * 220));
+    setTimeout(pulse, 60 + Math.floor(Math.random() * 200));
   }
 
   pulse();
@@ -1149,7 +1289,7 @@
 
 
 /* ===========================
-   HERO TITLE LETTER MOTION
+   HERO TITLE LETTER MOTION — ENHANCED
    =========================== */
 (function initHeroCharMotion() {
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1158,11 +1298,11 @@
 
   function joltChar(ch) {
     if (!ch) return;
-    var dur = 90 + Math.floor(Math.random() * 140);
+    var dur = 80 + Math.floor(Math.random() * 150);
     ch.style.setProperty("--hero-jolt-dur", dur + "ms");
-    ch.style.setProperty("--hero-jx1", ((Math.random() * 4.4 - 2.2).toFixed(2)) + "px");
-    ch.style.setProperty("--hero-jx2", ((Math.random() * 4.4 - 2.2).toFixed(2)) + "px");
-    ch.style.setProperty("--hero-sk1", ((Math.random() * 8 - 4).toFixed(2)) + "deg");
+    ch.style.setProperty("--hero-jx1", ((Math.random() * 6 - 3).toFixed(2)) + "px");
+    ch.style.setProperty("--hero-jx2", ((Math.random() * 6 - 3).toFixed(2)) + "px");
+    ch.style.setProperty("--hero-sk1", ((Math.random() * 10 - 5).toFixed(2)) + "deg");
     ch.style.setProperty("--hero-sk2", ((Math.random() * 8 - 4).toFixed(2)) + "deg");
 
     ch.classList.remove("is-hero-jolt");
@@ -1172,11 +1312,11 @@
 
   function pulse() {
     if (!heroChars.length) return;
-    var count = 1 + Math.floor(Math.random() * 3);
+    var count = 1 + Math.floor(Math.random() * 4);
     for (var i = 0; i < count; i++) {
       joltChar(heroChars[(Math.random() * heroChars.length) | 0]);
     }
-    setTimeout(pulse, 120 + Math.floor(Math.random() * 260));
+    setTimeout(pulse, 100 + Math.floor(Math.random() * 240));
   }
 
   pulse();
@@ -1246,23 +1386,23 @@
 
   function burstOnChar(ch) {
     if (!ch) return;
-    var warpDuration = 80 + Math.floor(Math.random() * 150);
-    ch.style.setProperty("--sx1", ((Math.random() * 2.6 - 2.0).toFixed(2)) + "px");
-    ch.style.setProperty("--sy1", ((Math.random() * 1.8 - 0.9).toFixed(2)) + "px");
-    ch.style.setProperty("--sx2", ((Math.random() * 2.6 + 0.3).toFixed(2)) + "px");
-    ch.style.setProperty("--sy2", ((Math.random() * 1.8 - 0.9).toFixed(2)) + "px");
-    ch.style.setProperty("--blur1", (2 + Math.random() * 5).toFixed(2) + "px");
-    ch.style.setProperty("--blur2", (2 + Math.random() * 6).toFixed(2) + "px");
-    ch.style.setProperty("--ghost-a", (0.45 + Math.random() * 0.45).toFixed(2));
-    ch.style.setProperty("--ghost-b", (0.35 + Math.random() * 0.45).toFixed(2));
-    ch.style.setProperty("--glow-size", (4 + Math.random() * 9).toFixed(2) + "px");
-    ch.style.setProperty("--wx", ((Math.random() * 4.2 - 2.1).toFixed(2)) + "px");
-    ch.style.setProperty("--wskew", ((Math.random() * 18 - 9).toFixed(2)) + "deg");
-    ch.style.setProperty("--wscale", (0.9 + Math.random() * 0.24).toFixed(3));
-    ch.style.setProperty("--cut-top-l", (Math.random() * 14).toFixed(2) + "%");
-    ch.style.setProperty("--cut-top-r", (Math.random() * 14).toFixed(2) + "%");
-    ch.style.setProperty("--cut-bottom-l", (Math.random() * 16).toFixed(2) + "%");
-    ch.style.setProperty("--cut-bottom-r", (Math.random() * 16).toFixed(2) + "%");
+    var warpDuration = 60 + Math.floor(Math.random() * 140);
+    ch.style.setProperty("--sx1", ((Math.random() * 3.5 - 2.2).toFixed(2)) + "px");
+    ch.style.setProperty("--sy1", ((Math.random() * 2.5 - 1.25).toFixed(2)) + "px");
+    ch.style.setProperty("--sx2", ((Math.random() * 3.5 + 0.3).toFixed(2)) + "px");
+    ch.style.setProperty("--sy2", ((Math.random() * 2.5 - 1.25).toFixed(2)) + "px");
+    ch.style.setProperty("--blur1", (3 + Math.random() * 6).toFixed(2) + "px");
+    ch.style.setProperty("--blur2", (3 + Math.random() * 8).toFixed(2) + "px");
+    ch.style.setProperty("--ghost-a", (0.5 + Math.random() * 0.45).toFixed(2));
+    ch.style.setProperty("--ghost-b", (0.4 + Math.random() * 0.45).toFixed(2));
+    ch.style.setProperty("--glow-size", (6 + Math.random() * 12).toFixed(2) + "px");
+    ch.style.setProperty("--wx", ((Math.random() * 5 - 2.5).toFixed(2)) + "px");
+    ch.style.setProperty("--wskew", ((Math.random() * 22 - 11).toFixed(2)) + "deg");
+    ch.style.setProperty("--wscale", (0.88 + Math.random() * 0.26).toFixed(3));
+    ch.style.setProperty("--cut-top-l", (Math.random() * 18).toFixed(2) + "%");
+    ch.style.setProperty("--cut-top-r", (Math.random() * 18).toFixed(2) + "%");
+    ch.style.setProperty("--cut-bottom-l", (Math.random() * 20).toFixed(2) + "%");
+    ch.style.setProperty("--cut-bottom-r", (Math.random() * 20).toFixed(2) + "%");
     ch.style.setProperty("--warp-dur", warpDuration + "ms");
     ch.classList.add("is-glitch");
     setTimeout(function () {
@@ -1272,11 +1412,11 @@
 
   function pulse() {
     if (!chars.length) return;
-    var burstCount = 1 + Math.floor(Math.random() * 4);
+    var burstCount = 1 + Math.floor(Math.random() * 5);
     for (var i = 0; i < burstCount; i++) {
       burstOnChar(chars[(Math.random() * chars.length) | 0]);
     }
-    setTimeout(pulse, 65 + Math.floor(Math.random() * 230));
+    setTimeout(pulse, 50 + Math.floor(Math.random() * 200));
   }
 
   pulse();
