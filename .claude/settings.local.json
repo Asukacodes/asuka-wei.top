@@ -15,7 +15,9 @@
       "Bash(wc:*)",
       "Bash(node --check script.js)",
       "Bash(node --check style.css)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Skill(gsd-update)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }
