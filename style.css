@@ -411,56 +411,56 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   animation-delay: var(--char-delay, 0s);
 }
 
-/* Staggered RGB glitch timing per character — original fonts per letter */
-/* ASUKA line: 5 letters, each with unique font */
+/* Staggered RGB glitch timing per character — Rajdhani + Orbitron + Audiowide (CP2077 style) */
+/* ASUKA line: 5 letters */
 .title-line[data-text="ASUKA"] .hero-char:nth-child(1) {
   --char-delay: 0s;
-  font-family: "Orbitron", "Audiowide", sans-serif;
-  font-weight: 900;
+  font-family: "Rajdhani", "Audiowide", sans-serif;
+  font-weight: 700;
   font-size: 1.08em;
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(2) {
   --char-delay: 0.35s;
-  font-family: "Orbitron", "Oxanium", sans-serif;
+  font-family: "Orbitron", "Rajdhani", sans-serif;
   font-weight: 800;
   font-size: 1.04em;
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(3) {
   --char-delay: 0.7s;
-  font-family: "Teko", "Oxanium", sans-serif;
-  font-weight: 700;
+  font-family: "Audiowide", "Orbitron", sans-serif;
+  font-weight: 400;
   font-size: 1.1em;
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(4) {
   --char-delay: 1.05s;
-  font-family: "Share Tech Mono", "Oxanium", monospace;
+  font-family: "Rajdhani", "Orbitron", sans-serif;
   font-weight: 700;
   font-size: 1.06em;
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(5) {
   --char-delay: 1.4s;
-  font-family: "Audiowide", "Oxanium", sans-serif;
-  font-weight: 700;
+  font-family: "Orbitron", "Audiowide", sans-serif;
+  font-weight: 900;
   font-size: 1.12em;
 }
 
 /* WEI line: 3 letters */
 .title-line[data-text="WEI"] .hero-char:nth-child(1) {
   --char-delay: 0.15s;
-  font-family: "Audiowide", "Orbitron", sans-serif;
+  font-family: "Audiowide", "Rajdhani", sans-serif;
   font-weight: 400;
   font-size: 1.1em;
 }
 .title-line[data-text="WEI"] .hero-char:nth-child(2) {
   --char-delay: 0.5s;
-  font-family: "Teko", "Audiowide", sans-serif;
+  font-family: "Rajdhani", "Audiowide", sans-serif;
   font-weight: 700;
   font-size: 1.05em;
 }
 .title-line[data-text="WEI"] .hero-char:nth-child(3) {
   --char-delay: 0.85s;
-  font-family: "Share Tech Mono", "Teko", monospace;
-  font-weight: 700;
+  font-family: "Orbitron", "Rajdhani", sans-serif;
+  font-weight: 900;
   font-size: 1.08em;
 }
 
@@ -529,8 +529,8 @@ a { color: inherit; text-decoration: none; text-transform: none; }
 
 .title-line .hero-char--lead-a,
 .title-line .hero-char--lead-w {
-  font-family: "Orbitron", "Audiowide", "Oxanium", sans-serif !important;
-  font-weight: 900 !important;
+  font-family: "Rajdhani", "Audiowide", sans-serif !important;
+  font-weight: 700 !important;
   transform: translateX(0);
   letter-spacing: 0.01em;
   text-shadow:
