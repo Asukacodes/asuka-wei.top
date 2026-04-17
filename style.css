@@ -417,7 +417,7 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   --char-delay: 0s;
   font-family: "Audiowide", "Orbitron", sans-serif;
   font-weight: 400;
-  font-size: 1.18em;
+  font-size: 1.5em;
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(2) {
   --char-delay: 0.35s;
