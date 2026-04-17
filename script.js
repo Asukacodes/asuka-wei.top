@@ -449,7 +449,9 @@
     { primary: "var(--blue)", accent: "var(--accent)", blue: "var(--blue)", text: "var(--blue)" },
     // 2: Projects — red/pink
     { primary: "var(--accent)", accent: "var(--primary)", blue: "var(--blue)", text: "var(--accent)" },
-    // 3: Contact — green/cyan
+    // 3: Notes — purple
+    { primary: "#c864ff", accent: "var(--accent)", blue: "var(--blue)", text: "#c864ff" },
+    // 4: Contact — green/cyan
     { primary: "#00ff8c", accent: "var(--accent)", blue: "var(--blue)", text: "#00ff8c" },
   ];
 
@@ -524,9 +526,10 @@
      Left matrix sweeps left->right then fades out
      ============================================== */
   function startFullSweepTransition(fromIdx, toIdx) {
-    isAnimating = true;
-    var switched = false;
-    var showSweepStripe = false;
+    try {
+      isAnimating = true;
+      var switched = false;
+      var showSweepStripe = false;
 
     var themeColors = [
       { r: 245, g: 230, b: 66 },  // hero: yellow
@@ -677,6 +680,17 @@
     }
 
     requestAnimationFrame(frame);
+    } catch (err) {
+      console.error("Sweep transition error:", err);
+      isAnimating = false;
+      // Fallback: just switch sections directly
+      prevSec.classList.remove("active", "prev");
+      nextSec.classList.remove("prev");
+      nextSec.classList.add("active");
+      currentSection = toIdx;
+      updateUI();
+      revealSection(nextSec);
+    }
   }
 
   function isWiperPair(fromIdx, toIdx) {
