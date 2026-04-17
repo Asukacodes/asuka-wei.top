@@ -477,7 +477,9 @@
   }
 
   function isSweepPair(fromIdx, toIdx) {
-    return (fromIdx === 2 && toIdx === 3) || (fromIdx === 3 && toIdx === 2);
+    // Projects (2) <-> Notes (3) and Notes (3) <-> Contact (4)
+    return (fromIdx === 2 && toIdx === 3) || (fromIdx === 3 && toIdx === 2) ||
+           (fromIdx === 3 && toIdx === 4) || (fromIdx === 4 && toIdx === 3);
   }
 
   function goToSection(index) {
