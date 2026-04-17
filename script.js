@@ -1195,21 +1195,16 @@
     // Particle explosion
     burstParticles();
 
-    // Screen shake
-    document.body.style.transition = "none";
-    var shakeFrames = 0;
-    var shakeIntensity = 3 + Math.random() * 4;
-    var shakeId = setInterval(function () {
-      var x = (Math.random() - 0.5) * shakeIntensity * (1 - shakeFrames / 12);
-      var y = (Math.random() - 0.5) * shakeIntensity * (1 - shakeFrames / 12);
-      document.body.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
-      shakeFrames++;
-      if (shakeFrames >= 12) {
-        clearInterval(shakeId);
-        document.body.style.transform = "";
-        document.body.style.transition = "";
-      }
-    }, 25);
+    // Screen shake using CSS class
+    var container = document.querySelector(".scroll-container");
+    if (container) {
+      container.classList.remove("screen-shake");
+      void container.offsetWidth;
+      container.classList.add("screen-shake");
+      setTimeout(function () {
+        container.classList.remove("screen-shake");
+      }, 300);
+    }
   }
 
   function scheduleNext() {
