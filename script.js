@@ -530,6 +530,7 @@
       { r: 245, g: 230, b: 66 },  // hero: yellow
       { r: 0,   g: 212, b: 255 }, // about: cyan
       { r: 255, g: 43,  b: 94  }, // projects: red
+      { r: 200, g: 100, b: 255 }, // notes: purple
       { r: 0,   g: 255, b: 140 }, // contact: green
     ];
 
@@ -851,6 +852,7 @@
       { r: 245, g: 230, b: 66 },  // hero: yellow
       { r: 0,   g: 212, b: 255 }, // about: cyan
       { r: 255, g: 43,  b: 94  }, // projects: red
+      { r: 200, g: 100, b: 255 }, // notes: purple
       { r: 0,   g: 255, b: 140 }, // contact: green
     ];
 
@@ -1049,7 +1051,8 @@
       var sectionIndex = 0;
       if (href === "#about") sectionIndex = 1;
       else if (href === "#projects") sectionIndex = 2;
-      else if (href === "#contact") sectionIndex = 3;
+      else if (href === "#notes") sectionIndex = 3;
+      else if (href === "#contact") sectionIndex = 4;
       goToSection(sectionIndex);
     });
   });
