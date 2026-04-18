@@ -409,57 +409,73 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   animation-delay: var(--char-delay, 0s);
 }
 
-/* Staggered RGB glitch timing per character — Rajdhani + Orbitron + Audiowide (CP2077 style) */
-/* ASUKA line: 5 letters */
+/* Staggered RGB glitch timing per character — mixed cyberpunk display set */
+/* ASUKA line: 5 letters (each letter unique but stylistically cohesive) */
 .title-line[data-text="ASUKA"] .hero-char:nth-child(1) {
   --char-delay: 0s;
-  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
+  font-family: "Audiowide", "Orbitron", "Oxanium", sans-serif;
   font-weight: 900;
-  font-size: 1.5em;
+  font-size: 1.46em;
+  letter-spacing: 0.01em;
+  transform: translateY(-1px) skewX(-2deg);
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(2) {
   --char-delay: 0.35s;
-  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
-  font-weight: 800;
-  font-size: 1.04em;
+  font-family: "Oxanium", "Orbitron", "Share Tech Mono", sans-serif;
+  font-weight: 700;
+  font-size: 1.08em;
+  letter-spacing: 0.015em;
+  transform: translateY(0px) skewX(-1deg);
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(3) {
   --char-delay: 0.7s;
-  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
-  font-weight: 800;
-  font-size: 1.1em;
+  font-family: "Teko", "Oxanium", "Orbitron", sans-serif;
+  font-weight: 700;
+  font-size: 1.14em;
+  letter-spacing: 0.02em;
+  transform: translateY(1px) skewX(-2deg);
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(4) {
   --char-delay: 1.05s;
-  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
-  font-weight: 800;
-  font-size: 1.06em;
+  font-family: "Share Tech Mono", "Orbitron", "Oxanium", monospace;
+  font-weight: 700;
+  font-size: 1.08em;
+  letter-spacing: 0.012em;
+  transform: translateY(0px) skewX(-1deg);
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(5) {
   --char-delay: 1.4s;
-  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
+  font-family: "Orbitron", "Audiowide", "Oxanium", sans-serif;
   font-weight: 800;
-  font-size: 1.12em;
+  font-size: 1.1em;
+  letter-spacing: 0.018em;
+  transform: translateY(0px) skewX(-2deg);
 }
 
-/* WEI line: 3 letters */
+/* WEI line: 3 letters (each letter unique) */
 .title-line[data-text="WEI"] .hero-char:nth-child(1) {
   --char-delay: 0.15s;
-  font-family: "Audiowide", "Rajdhani", sans-serif;
-  font-weight: 400;
-  font-size: 1.1em;
+  font-family: "Orbitron", "Audiowide", "Oxanium", sans-serif;
+  font-weight: 900;
+  font-size: 1.16em;
+  letter-spacing: 0.01em;
+  transform: translateY(-1px) skewX(-2deg);
 }
 .title-line[data-text="WEI"] .hero-char:nth-child(2) {
   --char-delay: 0.5s;
-  font-family: "Rajdhani", "Audiowide", sans-serif;
+  font-family: "Teko", "Oxanium", "Orbitron", sans-serif;
   font-weight: 700;
-  font-size: 1.05em;
+  font-size: 1.1em;
+  letter-spacing: 0.018em;
+  transform: translateY(1px) skewX(-1deg);
 }
 .title-line[data-text="WEI"] .hero-char:nth-child(3) {
   --char-delay: 0.85s;
-  font-family: "Orbitron", "Rajdhani", sans-serif;
-  font-weight: 900;
+  font-family: "Share Tech Mono", "Orbitron", "Oxanium", monospace;
+  font-weight: 800;
   font-size: 1.08em;
+  letter-spacing: 0.012em;
+  transform: translateY(0px) skewX(-2deg);
 }
 
 @keyframes charRGBGlitch {
@@ -527,6 +543,21 @@ a { color: inherit; text-decoration: none; text-transform: none; }
     -1px 0 0 rgba(0, 212, 255, 0.75),
     1px 0 0 rgba(255, 200, 100, 0.75),
     0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+/* Make leading A the most iconic cyber glyph */
+.title-line[data-text="ASUKA"] .hero-char--lead-a {
+  font-family: "Monoton", "Audiowide", "Orbitron", sans-serif !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.03em;
+  transform: translateX(0) translateY(-1px);
+  text-shadow:
+    0 0 6px rgba(0, 212, 255, 0.75),
+    0 0 18px rgba(0, 212, 255, 0.55),
+    0 0 34px rgba(245, 230, 66, 0.45),
+    1px 1px 0 rgba(0, 212, 255, 0.7),
+    2px 2px 0 rgba(0, 212, 255, 0.38),
+    0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* Enhanced chromatic aberration slice — ghost layers */
