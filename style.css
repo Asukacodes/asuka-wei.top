@@ -413,32 +413,32 @@ a { color: inherit; text-decoration: none; text-transform: none; }
 /* ASUKA line: 5 letters */
 .title-line[data-text="ASUKA"] .hero-char:nth-child(1) {
   --char-delay: 0s;
-  font-family: "Audiowide", "Orbitron", sans-serif;
-  font-weight: 400;
+  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
+  font-weight: 900;
   font-size: 1.5em;
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(2) {
   --char-delay: 0.35s;
-  font-family: "Orbitron", "Rajdhani", sans-serif;
+  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
   font-weight: 800;
   font-size: 1.04em;
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(3) {
   --char-delay: 0.7s;
-  font-family: "Audiowide", "Orbitron", sans-serif;
-  font-weight: 400;
+  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
+  font-weight: 800;
   font-size: 1.1em;
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(4) {
   --char-delay: 1.05s;
-  font-family: "Rajdhani", "Orbitron", sans-serif;
-  font-weight: 700;
+  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
+  font-weight: 800;
   font-size: 1.06em;
 }
 .title-line[data-text="ASUKA"] .hero-char:nth-child(5) {
   --char-delay: 1.4s;
-  font-family: "Rajdhani", "Orbitron", sans-serif;
-  font-weight: 700;
+  font-family: "Orbitron", "Oxanium", "Share Tech Mono", sans-serif;
+  font-weight: 800;
   font-size: 1.12em;
 }
 

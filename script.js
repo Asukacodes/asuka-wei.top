@@ -416,6 +416,7 @@
 
   var currentSection = 0;
   var isAnimating = false;
+  var animLockStartedAt = 0;
   var wheelAccum = 0;
   var wiperState = null;
   var hardwareThreads = navigator.hardwareConcurrency || 4;
@@ -478,6 +479,32 @@
     applyTheme(currentSection);
   }
 
+  function markAnimating() {
+    isAnimating = true;
+    animLockStartedAt = Date.now();
+  }
+
+  function clearAnimating() {
+    isAnimating = false;
+    animLockStartedAt = 0;
+  }
+
+  function recoverIfAnimationStuck() {
+    if (!isAnimating) return;
+    if (!animLockStartedAt) return;
+    if (Date.now() - animLockStartedAt < 2600) return;
+
+    // Failsafe: restore to a healthy interactive state.
+    clearAnimating();
+    sections.forEach(function (section, idx) {
+      section.classList.remove("prev", "wiper-top", "wiper-under");
+      section.classList.toggle("active", idx === currentSection);
+    });
+    if (wiperState) {
+      cleanupWiperTransition();
+    }
+  }
+
   function isSweepPair(fromIdx, toIdx) {
     // Projects (2) <-> Notes (3) and Notes (3) <-> Contact (4)
     return (fromIdx === 2 && toIdx === 3) || (fromIdx === 3 && toIdx === 2) ||
@@ -485,6 +512,7 @@
   }
 
   function goToSection(index) {
+    recoverIfAnimationStuck();
     if (isAnimating || index < 0 || index >= sections.length || index === currentSection) return;
 
     var prevSection = sections[currentSection];
@@ -499,7 +527,7 @@
     // Normal sections: minimal edge particle effect
     triggerTransitionFX(index > currentSection ? 1 : -1);
 
-    isAnimating = true;
+    markAnimating();
     prevSection.classList.remove("active");
     if (index > currentSection) {
       prevSection.classList.add("prev");
@@ -516,7 +544,7 @@
     updateUI();
 
     setTimeout(function () {
-      isAnimating = false;
+      clearAnimating();
       prevSection.classList.remove("prev");
     }, 700);
   }
@@ -527,7 +555,7 @@
      ============================================== */
   function startFullSweepTransition(fromIdx, toIdx) {
     try {
-      isAnimating = true;
+      markAnimating();
       var switched = false;
       var showSweepStripe = false;
 
@@ -552,7 +580,7 @@
 
     var fxCanvas = createFxCanvas(container);
     if (!fxCanvas) {
-      isAnimating = false;
+      clearAnimating();
       return;
     }
     var ctx = fxCanvas.ctx;
@@ -605,6 +633,7 @@
     var coverRatio = 0.55;
 
     function frame(ts) {
+      try {
       var elapsed = ts - startTime;
       var progress = Math.min(elapsed / duration, 1);
       var coverProgress = Math.min(progress / coverRatio, 1);
@@ -675,14 +704,25 @@
           revealSection(nextSec);
         }
         if (container.parentNode) container.parentNode.removeChild(container);
-        isAnimating = false;
+        clearAnimating();
+      }
+      } catch (err) {
+        console.error("Sweep frame error:", err);
+        if (container.parentNode) container.parentNode.removeChild(container);
+        clearAnimating();
+        prevSec.classList.remove("active", "prev");
+        nextSec.classList.remove("prev");
+        nextSec.classList.add("active");
+        currentSection = toIdx;
+        updateUI();
+        revealSection(nextSec);
       }
     }
 
     requestAnimationFrame(frame);
     } catch (err) {
       console.error("Sweep transition error:", err);
-      isAnimating = false;
+      clearAnimating();
       // Fallback: just switch sections directly
       prevSec.classList.remove("active", "prev");
       nextSec.classList.remove("prev");
@@ -791,7 +831,7 @@
     wiperState.nextSection.classList.remove("active", "prev");
     wiperState.prevSection.classList.add("active");
     cleanupWiperTransition();
-    isAnimating = false;
+    clearAnimating();
     wheelAccum = 0;
     lastWheelDir = 0;
   }
@@ -808,7 +848,7 @@
     cleanupWiperTransition();
     updateUI();
     revealSection(nextSection);
-    isAnimating = false;
+    clearAnimating();
     wheelAccum = 0;
     lastWheelDir = 0;
   }
@@ -817,7 +857,7 @@
     var prevSection = sections[currentSection];
     var nextSection = sections[targetIndex];
 
-    isAnimating = true;
+    markAnimating();
     wiperState = {
       fromIndex: currentSection,
       toIndex: targetIndex,
@@ -998,6 +1038,7 @@
   var wheelDebounce = null;
 
   document.addEventListener("wheel", function (e) {
+    recoverIfAnimationStuck();
     e.preventDefault();
 
     var delta = e.deltaY || e.detail || -e.wheelDelta;
@@ -1040,6 +1081,7 @@
 
   // ---- Keyboard ----
   document.addEventListener("keydown", function (e) {
+    recoverIfAnimationStuck();
     if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
       e.preventDefault(); goToSection(currentSection + 1);
     } else if (e.key === "ArrowUp" || e.key === "PageUp") {
@@ -1054,6 +1096,7 @@
   // ---- Dots ----
   dots.forEach(function (dot) {
     dot.addEventListener("click", function () {
+      recoverIfAnimationStuck();
       var target = parseInt(this.getAttribute("data-target"), 10);
       goToSection(target);
     });
@@ -1062,6 +1105,7 @@
   // ---- Nav ----
   document.querySelectorAll(".nav-link").forEach(function (link) {
     link.addEventListener("click", function (e) {
+      recoverIfAnimationStuck();
       e.preventDefault();
       var href = this.getAttribute("href");
       var sectionIndex = 0;
