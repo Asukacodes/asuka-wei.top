@@ -17,7 +17,8 @@
       "Bash(node --check style.css)",
       "Bash(node:*)",
       "Skill(gsd-update)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(codex login *)"
     ]
   }
 }

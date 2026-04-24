@@ -578,6 +578,20 @@
     container.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden";
     document.body.appendChild(container);
 
+    // Create glitch overlay for sweep effect
+    var glitchOverlay = document.createElement("div");
+    glitchOverlay.style.cssText = "position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 0.1s";
+    container.appendChild(glitchOverlay);
+
+    // Create RGB split layers
+    var rgbLayerLeft = document.createElement("div");
+    rgbLayerLeft.style.cssText = "position:absolute;top:0;left:-4px;width:100%;height:100%;background:rgba(255,43,94,0.03);mix-blend-mode:screen;pointer-events:none";
+    container.appendChild(rgbLayerLeft);
+
+    var rgbLayerRight = document.createElement("div");
+    rgbLayerRight.style.cssText = "position:absolute;top:0;left:4px;width:100%;height:100%;background:rgba(0,212,255,0.03);mix-blend-mode:screen;pointer-events:none";
+    container.appendChild(rgbLayerRight);
+
     var fxCanvas = createFxCanvas(container);
     if (!fxCanvas) {
       clearAnimating();
@@ -693,6 +707,28 @@
       }
 
       if (progress < 1) {
+        // Update glitch overlay with horizontal scan lines
+        var glitchIntensity = progress < 0.5 ? progress * 0.4 : (1 - progress) * 0.8;
+        glitchOverlay.style.opacity = glitchIntensity;
+        glitchOverlay.style.background = "repeating-linear-gradient(0deg,transparent," +
+          "transparent " + Math.floor(Math.random() * 4 + 2) + "px," +
+          "rgba(" + cr + "," + cg + "," + cb + "," + (glitchIntensity * 0.3) + ") " +
+          Math.floor(Math.random() * 4 + 2) + "px)";
+
+        // Animate RGB split layers
+        var rgbOffset = Math.sin(progress * Math.PI * 4) * 6;
+        rgbLayerLeft.style.transform = "translateX(" + (-4 + rgbOffset) + "px)";
+        rgbLayerRight.style.transform = "translateX(" + (4 - rgbOffset) + "px)";
+
+        // Add random horizontal glitch bars
+        if (Math.random() < 0.15) {
+          var bar = document.createElement("div");
+          bar.style.cssText = "position:absolute;left:0;top:" + (Math.random() * 100) + "%;width:100%;height:" +
+            (2 + Math.random() * 8) + "px;background:rgba(255,255,255," + (0.1 + Math.random() * 0.2) + ")";
+          glitchOverlay.appendChild(bar);
+          setTimeout(function() { if (bar.parentNode) bar.parentNode.removeChild(bar); }, 100);
+        }
+
         requestAnimationFrame(frame);
       } else {
         if (!switched) {
@@ -897,8 +933,8 @@
   }
 
   /* ==============================================
-     CYBERPUNK TRANSITION FX
-     Edge-only particles + color crossfade
+     ADVANCED CYBERPUNK TRANSITION FX
+     Glitch flash + chromatic aberration + data streams
      ============================================== */
   function triggerTransitionFX(direction) {
     var nextIdx = currentSection + direction;
@@ -914,108 +950,204 @@
 
     var fromCol = themeColors[currentSection];
     var toCol = themeColors[nextIdx];
-    // Minimal transition FX: no full-screen flash, only edge particles.
+
+    // Create main container
     var container = document.createElement("div");
     container.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden";
     document.body.appendChild(container);
+
+    // Create glitch flash overlay
+    var flashOverlay = document.createElement("div");
+    flashOverlay.style.cssText = "position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,43,94,0.3),rgba(0,212,255,0.3),rgba(245,230,66,0.3));mix-blend-mode:screen;opacity:0;pointer-events:none";
+    container.appendChild(flashOverlay);
+
+    // Create scan lines container
+    var scanContainer = document.createElement("div");
+    scanContainer.style.cssText = "position:absolute;inset:0;pointer-events:none;overflow:hidden";
+    container.appendChild(scanContainer);
 
     var fxCanvas = createFxCanvas(container);
     if (!fxCanvas) return;
     var ctx = fxCanvas.ctx;
     var W = fxCanvas.width;
     var H = fxCanvas.height;
-    var railW = Math.max(70, Math.floor(W * (lowPowerFx ? 0.1 : 0.12)));
 
+    // === Enhanced particle system with RGB split ===
     function spawnParticle(side) {
       var onLeft = side === "left";
-      var baseX = onLeft ? Math.random() * railW : W - railW + Math.random() * railW;
-      var speedY = (1.5 + Math.random() * 3.5) * (direction > 0 ? 1 : -1);
+      var baseX = onLeft ? Math.random() * 80 : W - 80 + Math.random() * 80;
+      var speedY = (2 + Math.random() * 5) * (direction > 0 ? 1 : -1);
       return {
         x: baseX,
         y: Math.random() * H,
-        vx: (onLeft ? 1 : -1) * (0.1 + Math.random() * 0.9),
+        vx: (onLeft ? 1 : -1) * (0.5 + Math.random() * 1.5),
         vy: speedY,
-        size: 0.8 + Math.random() * 1.8,
-        life: 0.35 + Math.random() * 0.65,
-        decay: 0.01 + Math.random() * 0.02,
+        size: 1 + Math.random() * 2.5,
+        life: 0.4 + Math.random() * 0.6,
+        decay: 0.008 + Math.random() * 0.015,
+        hue: Math.random(),
+        trail: [],
       };
     }
 
     var particles = [];
-    var particleCount = Math.max(30, Math.floor((W / 24) * fxIntensity));
+    var particleCount = Math.max(50, Math.floor((W / 18) * fxIntensity));
     for (var p = 0; p < particleCount; p++) {
       particles.push(spawnParticle(p % 2 === 0 ? "left" : "right"));
     }
 
-    var streaks = [];
-    for (var s = 0; s < Math.max(8, Math.floor(14 * fxIntensity)); s++) {
-      var leftSide = s % 2 === 0;
-      streaks.push({
-        x: leftSide ? Math.random() * railW : W - railW + Math.random() * railW,
+    // === Data stream streaks ===
+    function spawnStreak(side) {
+      var onLeft = side === "left";
+      return {
+        x: onLeft ? Math.random() * 100 : W - 100 + Math.random() * 100,
         y: Math.random() * H,
-        len: 10 + Math.random() * 26,
-        speed: (2 + Math.random() * 4) * (direction > 0 ? 1 : -1),
-        life: 0.4 + Math.random() * 0.6,
-      });
+        len: 20 + Math.random() * 50,
+        speed: (3 + Math.random() * 6) * (direction > 0 ? 1 : -1),
+        life: 0.5 + Math.random() * 0.5,
+        decay: 0.012 + Math.random() * 0.015,
+        chars: "!@#$%^&*()+=0123456789<>?/\\|~`",
+      };
+    }
+
+    var streaks = [];
+    for (var s = 0; s < Math.max(15, Math.floor(20 * fxIntensity)); s++) {
+      streaks.push(spawnStreak(s % 2 === 0 ? "left" : "right"));
+    }
+
+    // === Glitch lines ===
+    var glitchLines = [];
+    function spawnGlitchLine() {
+      return {
+        y: Math.random() * H,
+        height: 2 + Math.random() * 8,
+        x: Math.random() * W,
+        width: Math.random() * W * 0.6,
+        life: 0.15 + Math.random() * 0.2,
+        speed: (Math.random() - 0.5) * 20,
+        isHorizontal: Math.random() > 0.7,
+      };
+    }
+
+    for (var g = 0; g < 8; g++) {
+      glitchLines.push(spawnGlitchLine());
     }
 
     var startTime = performance.now();
-    var duration = 420;
+    var duration = 550;
 
     function frame(ts) {
       var elapsed = ts - startTime;
       var progress = Math.min(elapsed / duration, 1);
       var envelope = Math.sin(progress * Math.PI); // 0->1->0
+      var glitchIntensity = progress < 0.3 ? (1 - progress / 0.3) : 0;
 
       ctx.clearRect(0, 0, W, H);
 
       var cr = Math.floor(fromCol.r + (toCol.r - fromCol.r) * progress);
       var cg = Math.floor(fromCol.g + (toCol.g - fromCol.g) * progress);
-      var cb = Math.floor(fromCol.b + (toCol.b - fromCol.b) * progress);
+      var cb = Math.floor(fromCol.g - fromCol.g + toCol.b - fromCol.b) * progress + fromCol.b;
 
+      // === Draw RGB split particles ===
       for (var i = 0; i < particles.length; i++) {
         var pt = particles[i];
         pt.x += pt.vx;
         pt.y += pt.vy;
         pt.life -= pt.decay;
 
-        if (pt.life <= 0 || pt.y < -20 || pt.y > H + 20 || pt.x < -20 || pt.x > W + 20) {
+        if (pt.life <= 0 || pt.y < -30 || pt.y > H + 30) {
           particles[i] = spawnParticle(i % 2 === 0 ? "left" : "right");
           pt = particles[i];
         }
 
-        var pa = envelope * pt.life * 0.9;
+        var pa = envelope * pt.life * 0.85;
         if (pa < 0.02) continue;
 
-        ctx.fillStyle = "rgba(" + cr + "," + cg + "," + cb + "," + pa + ")";
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-        ctx.fill();
+        // RGB split effect - draw 3 particles offset
+        var offset = 3 + glitchIntensity * 6;
+        ctx.globalAlpha = pa;
+        // Red channel (left)
+        ctx.fillStyle = "rgba(255,43,94," + pa + ")";
+        ctx.fillRect(pt.x - offset, pt.y, pt.size, pt.size);
+        // Green channel (center)
+        ctx.fillStyle = "rgba(0,255," + Math.floor(140 + progress * 115) + "," + pa + ")";
+        ctx.fillRect(pt.x, pt.y, pt.size, pt.size);
+        // Blue channel (right)
+        ctx.fillStyle = "rgba(0,212,255," + pa + ")";
+        ctx.fillRect(pt.x + offset, pt.y, pt.size, pt.size);
+        ctx.globalAlpha = 1;
       }
 
-      ctx.lineWidth = 1.2;
+      // === Draw data stream streaks ===
+      ctx.font = (lowPowerFx ? "10px" : "12px") + " 'Share Tech Mono', monospace";
+      ctx.textBaseline = "top";
       for (var j = 0; j < streaks.length; j++) {
         var st = streaks[j];
         st.y += st.speed;
-        st.life -= 0.02;
-        if (st.life <= 0 || st.y < -40 || st.y > H + 40) {
-          var leftSide = j % 2 === 0;
-          streaks[j] = {
-            x: leftSide ? Math.random() * railW : W - railW + Math.random() * railW,
-            y: Math.random() * H,
-            len: 10 + Math.random() * 26,
-            speed: (2 + Math.random() * 4) * (direction > 0 ? 1 : -1),
-            life: 0.4 + Math.random() * 0.6,
-          };
+        st.life -= 0.01;
+        if (st.life <= 0 || st.y < -60 || st.y > H + 60) {
+          streaks[j] = spawnStreak(j % 2 === 0 ? "left" : "right");
           st = streaks[j];
         }
-        var sa = envelope * st.life * 0.65;
+        var sa = envelope * st.life * 0.7;
         if (sa < 0.02) continue;
-        ctx.strokeStyle = "rgba(" + Math.min(cr + 35, 255) + "," + Math.min(cg + 35, 255) + "," + Math.min(cb + 35, 255) + "," + sa + ")";
-        ctx.beginPath();
-        ctx.moveTo(st.x, st.y);
-        ctx.lineTo(st.x + (direction > 0 ? 4 : -4), st.y - st.len * direction);
-        ctx.stroke();
+        ctx.fillStyle = "rgba(" + Math.min(cr + 40, 255) + "," + Math.min(cg + 40, 255) + "," + Math.min(cb + 40, 255) + "," + sa + ")";
+        var charLen = Math.min(Math.floor(st.len / 8), 8);
+        for (var c = 0; c < charLen; c++) {
+          var ch = st.chars[(Math.floor(st.y / 12) + c) % st.chars.length];
+          ctx.fillText(ch, st.x, st.y - c * 12);
+        }
+      }
+
+      // === Draw glitch lines ===
+      if (glitchIntensity > 0.1) {
+        for (var k = 0; k < glitchLines.length; k++) {
+          var gl = glitchLines[k];
+          gl.y += gl.speed;
+          gl.life -= 0.03;
+          if (gl.life <= 0) {
+            glitchLines[k] = spawnGlitchLine();
+            gl = glitchLines[k];
+          }
+          var gla = glitchIntensity * gl.life * 0.8;
+          if (gla < 0.05) continue;
+
+          // Draw RGB split glitch line
+          ctx.fillStyle = "rgba(255,43,94," + gla + ")";
+          ctx.fillRect(gl.x - 4, gl.y, gl.width, gl.height);
+          ctx.fillStyle = "rgba(0,212,255," + gla + ")";
+          ctx.fillRect(gl.x + 4, gl.y, gl.width, gl.height);
+          ctx.fillStyle = "rgba(" + cr + "," + cg + "," + cb + "," + gla + ")";
+          ctx.fillRect(gl.x, gl.y, gl.width, gl.height);
+        }
+      }
+
+      // === Edge glow ring ===
+      var edgeGlow = envelope * 0.3 * (1 - progress * 0.5);
+      var edgeWidth = 40 + glitchIntensity * 30;
+      // Top edge
+      var gradTop = ctx.createLinearGradient(0, 0, 0, edgeWidth);
+      gradTop.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + "," + edgeGlow + ")");
+      gradTop.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+      ctx.fillStyle = gradTop;
+      ctx.fillRect(0, 0, W, edgeWidth);
+      // Bottom edge
+      var gradBot = ctx.createLinearGradient(0, H - edgeWidth, 0, H);
+      gradBot.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+      gradBot.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + "," + edgeGlow + ")");
+      ctx.fillStyle = gradBot;
+      ctx.fillRect(0, H - edgeWidth, W, edgeWidth);
+
+      // === Glitch flash overlay ===
+      flashOverlay.style.opacity = glitchIntensity * 0.4;
+      flashOverlay.style.transform = "translateX(" + (Math.random() - 0.5) * glitchIntensity * 10 + "px)";
+
+      // === Horizontal scan line effect ===
+      if (Math.random() < 0.3 * glitchIntensity) {
+        var scanY = Math.random() * H;
+        var scanH = 2 + Math.random() * 6;
+        ctx.fillStyle = "rgba(255,255,255," + (0.1 + Math.random() * 0.2) * glitchIntensity + ")";
+        ctx.fillRect(0, scanY, W, scanH);
       }
 
       if (progress < 1) {
