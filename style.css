@@ -364,7 +364,7 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   transform: skewX(-10deg);
   text-transform: uppercase;
   overflow: visible;
-  animation: heroNeonPulse 2.8s ease-in-out infinite;
+  animation: heroHoloShift 3.5s ease-in-out infinite;
   background: linear-gradient(
     180deg,
     rgba(255, 252, 170, 0.98) 0%,
@@ -628,7 +628,7 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   -webkit-text-stroke: 2px rgba(245, 230, 66, 0.1);
   z-index: -1;
   transform: translate(5px, 0);
-  animation: heroOutlinePulse 2.9s ease-in-out infinite;
+  animation: heroOutlineHoloShift 3.7s ease-in-out infinite;
 }
 
 .title-line.accent {
@@ -680,17 +680,137 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   80% { transform: translate(2px, 1px); }
 }
 
-@keyframes heroNeonPulse {
-  0%, 100% { filter: brightness(1) saturate(1); }
-  25% { filter: brightness(1.08) saturate(1.08); }
-  50% { filter: brightness(0.97) saturate(1); }
-  75% { filter: brightness(1.12) saturate(1.1); }
+/* Holographic interference shift - replaces pulse */
+@keyframes heroHoloShift {
+  0%, 100% {
+    filter:
+      hue-rotate(0deg)
+      brightness(1)
+      saturate(1.2);
+    transform:
+      translateX(0)
+      perspective(800px)
+      rotateY(0deg);
+  }
+  15% {
+    filter:
+      hue-rotate(12deg)
+      brightness(1.15)
+      saturate(1.4);
+    transform:
+      translateX(-1px)
+      perspective(800px)
+      rotateY(0.5deg);
+  }
+  30% {
+    filter:
+      hue-rotate(-8deg)
+      brightness(0.95)
+      saturate(1.1);
+    transform:
+      translateX(2px)
+      perspective(800px)
+      rotateY(-0.3deg);
+  }
+  45% {
+    filter:
+      hue-rotate(20deg)
+      brightness(1.2)
+      saturate(1.5);
+    transform:
+      translateX(-1px)
+      perspective(800px)
+      rotateY(0.4deg);
+  }
+  60% {
+    filter:
+      hue-rotate(-15deg)
+      brightness(1.05)
+      saturate(1.25);
+    transform:
+      translateX(1px)
+      perspective(800px)
+      rotateY(-0.2deg);
+  }
+  75% {
+    filter:
+      hue-rotate(8deg)
+      brightness(1.1)
+      saturate(1.35);
+    transform:
+      translateX(-2px)
+      perspective(800px)
+      rotateY(0.3deg);
+  }
+  88% {
+    filter:
+      hue-rotate(-5deg)
+      brightness(1)
+      saturate(1.15);
+    transform:
+      translateX(0)
+      perspective(800px)
+      rotateY(0deg);
+  }
 }
 
-@keyframes heroOutlinePulse {
-  0%, 100% { opacity: 0.65; transform: translate(4px, 0); }
-  35% { opacity: 0.9; transform: translate(6px, -1px); }
-  70% { opacity: 0.58; transform: translate(3px, 1px); }
+@keyframes heroOutlineHoloShift {
+  0%, 100% {
+    opacity: 0.5;
+    transform:
+      translate(4px, 0)
+      scaleX(1)
+      skewX(0deg);
+    filter: hue-rotate(0deg);
+  }
+  12% {
+    opacity: 0.85;
+    transform:
+      translate(7px, -1px)
+      scaleX(1.02)
+      skewX(2deg);
+    filter: hue-rotate(15deg);
+  }
+  28% {
+    opacity: 0.4;
+    transform:
+      translate(2px, 2px)
+      scaleX(0.98)
+      skewX(-1deg);
+    filter: hue-rotate(-20deg);
+  }
+  42% {
+    opacity: 0.9;
+    transform:
+      translate(8px, -2px)
+      scaleX(1.03)
+      skewX(3deg);
+    filter: hue-rotate(25deg);
+  }
+  58% {
+    opacity: 0.55;
+    transform:
+      translate(3px, 1px)
+      scaleX(1)
+      skewX(-2deg);
+    filter: hue-rotate(-10deg);
+  }
+  72% {
+    opacity: 0.8;
+    transform:
+      translate(6px, 0)
+      scaleX(1.01)
+      skewX(1deg);
+    filter: hue-rotate(12deg);
+  }
+  88% {
+    opacity: 0.6;
+    transform:
+      translate(5px, -1px)
+      scaleX(1)
+      skewX(0deg);
+    filter: hue-rotate(-5deg);
+  }
 }
 
 @keyframes heroChromaticJitter {
