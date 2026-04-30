@@ -820,22 +820,20 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   z-index: 2;
 }
 
-/* CRT flicker animation - more noticeable */
+/* CRT flicker animation - slower */
 @keyframes crtFlicker {
   0% { opacity: 0.92; }
-  3% { opacity: 1; }
-  6% { opacity: 0.88; }
-  9% { opacity: 1; }
-  25% { opacity: 0.95; }
-  28% { opacity: 1; }
+  8% { opacity: 1; }
+  16% { opacity: 0.88; }
+  24% { opacity: 1; }
   50% { opacity: 0.9; }
-  53% { opacity: 1; }
+  58% { opacity: 1; }
   78% { opacity: 0.94; }
-  81% { opacity: 1; }
+  86% { opacity: 1; }
   100% { opacity: 0.92; }
 }
 
-/* CRT phosphor glow - stronger */
+/* CRT phosphor glow - slower pulse */
 .crt-glow {
   position: absolute;
   inset: 0;
@@ -848,7 +846,7 @@ a { color: inherit; text-decoration: none; text-transform: none; }
     );
   pointer-events: none;
   z-index: 4;
-  animation: phosphorPulse 3s ease-in-out infinite;
+  animation: phosphorPulse 6s ease-in-out infinite;
 }
 
 @keyframes phosphorPulse {
@@ -907,7 +905,7 @@ a { color: inherit; text-decoration: none; text-transform: none; }
     transparent 100%
   );
   opacity: 0;
-  animation: distortionLine 4s ease-in-out infinite;
+  animation: distortionLine 10s ease-in-out infinite;
 }
 
 .crt-distortion::before {
