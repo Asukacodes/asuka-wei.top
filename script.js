@@ -653,17 +653,6 @@
 
     // Particle explosion
     burstParticles();
-
-    // Screen shake using CSS class
-    var container = document.querySelector(".scroll-container");
-    if (container) {
-      container.classList.remove("screen-shake");
-      void container.offsetWidth;
-      container.classList.add("screen-shake");
-      setTimeout(function () {
-        container.classList.remove("screen-shake");
-      }, 300);
-    }
   }
 
   function scheduleNext() {
