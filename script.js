@@ -20,7 +20,7 @@
   var matrixFrameInterval = minFrameInterval;
 
   // ---- Per-section themes ----
-  // 0=HERO(machine/hex), 1=ABOUT(binary), 2=PROJECTS(symbols), 3=CONTACT(code)
+  // 0=HERO(machine/hex), 1=ABOUT(binary), 2=PROJECTS(symbols), 3=NOTES(data), 4=CONTACT(code)
   var themes = [
     {
       palette: [
@@ -95,6 +95,23 @@
         "#*@$#*@$", "@$%&@$%&",
       ],
       dark: { r: 40, g: 5, b: 15 },
+    },
+    {
+      palette: [
+        { r: 245/255, g: 230/255, b: 66/255 },   // yellow
+        { r: 255/255, g: 200/255, b: 60/255 },   // amber
+        { r: 255/255, g: 43/255, b: 94/255 },    // red
+        { r: 0/255, g: 212/255, b: 255/255 },    // cyan
+        { r: 140/255, g: 120/255, b: 15/255 },   // muted gold
+        { r: 40/255, g: 35/255, b: 5/255 },      // dark amber
+      ],
+      ascii: [
+        "log", "note", "memo", "ref", "data",
+        "////", "::::", "====", "----",
+        "id", "idx", "src", "tag",
+        "note.log", "cache", "memo://",
+      ],
+      dark: { r: 40, g: 35, b: 5 },
     },
     {
       palette: [
@@ -385,8 +402,8 @@
   // Expose theme setter
   window._setMatrixTheme = function(idx) {
     if (idx === currentTheme) return;
-    currentTheme = idx;
-    var t = themes[idx];
+    currentTheme = Math.max(0, Math.min(idx, themes.length - 1));
+    var t = themes[currentTheme];
     seedDataTarg.dark = t.dark;
     seedDataTarg.color0 = t.palette[0];
     seedDataTarg.color1 = t.palette[1];
@@ -406,521 +423,31 @@
 
 
 /* ==============================================
-   SMOOTH WHEEL SCROLL — Section Transitions
-   ============================================== */
+  STABLE WHEEL SCROLL — Section Transitions
+  ============================================== */
 (function initWheelScroll() {
-  var sections = document.querySelectorAll(".scroll-section");
-  var dots = document.querySelectorAll(".dot");
-  var counter = document.querySelector(".counter-current");
+  var sections = Array.from(document.querySelectorAll(".scroll-section"));
+  var dots = Array.from(document.querySelectorAll(".dot"));
   if (!sections.length) return;
 
   var currentSection = 0;
   var isAnimating = false;
-  var animLockStartedAt = 0;
   var wheelAccum = 0;
-  var wiperState = null;
-  var hardwareThreads = navigator.hardwareConcurrency || 4;
-  var deviceMemory = navigator.deviceMemory || 4;
-  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var lowPowerFx = prefersReducedMotion || hardwareThreads <= 4 || deviceMemory <= 4;
-  var fxResolutionScale = lowPowerFx ? 0.62 : 0.82;
-  var fxIntensity = lowPowerFx ? 0.65 : 1.0;
-
-  function createFxCanvas(container) {
-    var cssW = window.innerWidth;
-    var cssH = window.innerHeight;
-    var renderW = Math.max(1, Math.floor(cssW * fxResolutionScale));
-    var renderH = Math.max(1, Math.floor(cssH * fxResolutionScale));
-    var canvas = document.createElement("canvas");
-    canvas.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%";
-    canvas.width = renderW;
-    canvas.height = renderH;
-    container.appendChild(canvas);
-    var ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
-    if (!ctx) return null;
-    ctx.setTransform(renderW / cssW, 0, 0, renderH / cssH, 0, 0);
-    return { canvas: canvas, ctx: ctx, width: cssW, height: cssH };
-  }
-
-  // Per-section CSS theme variables
-  var sectionThemes = [
-    // 0: Hero — yellow/dark
-    { primary: "var(--primary)", accent: "var(--accent)", blue: "var(--blue)", text: "var(--primary)" },
-    // 1: About — blue/cyan
-    { primary: "var(--blue)", accent: "var(--accent)", blue: "var(--blue)", text: "var(--blue)" },
-    // 2: Projects — red/pink
-    { primary: "var(--accent)", accent: "var(--primary)", blue: "var(--blue)", text: "var(--accent)" },
-    // 3: Notes — purple
-    { primary: "#c864ff", accent: "var(--accent)", blue: "var(--blue)", text: "#c864ff" },
-    // 4: Contact — green/cyan
-    { primary: "#00ff8c", accent: "var(--accent)", blue: "var(--blue)", text: "#00ff8c" },
-  ];
+  var WHEEL_THRESHOLD = 70;
 
   function applyTheme(idx) {
     var root = document.documentElement;
-    var t = sectionThemes[idx];
-    // Update accent color variable for section-specific highlights
+    var stableIdx = Math.max(0, Math.min(idx, sections.length - 1));
+    var sectionThemes = [
+      { primary: "var(--primary)", accent: "var(--accent)" },
+      { primary: "var(--primary)", accent: "var(--accent)" },
+      { primary: "var(--primary)", accent: "var(--accent)" },
+      { primary: "var(--primary)", accent: "var(--accent)" },
+      { primary: "var(--primary)", accent: "var(--accent)" },
+    ];
+    var t = sectionThemes[stableIdx] || sectionThemes[0];
     root.style.setProperty("--section-primary", t.primary);
     root.style.setProperty("--section-accent", t.accent);
-  }
-
-  function updateUI() {
-    dots.forEach(function (dot, i) {
-      dot.classList.toggle("active", i === currentSection);
-    });
-    if (counter) {
-      counter.textContent = String(currentSection + 1).padStart(2, "0");
-    }
-    // Sync matrix theme
-    if (window._setMatrixTheme) {
-      window._setMatrixTheme(currentSection);
-    }
-    // Apply section color theme
-    applyTheme(currentSection);
-  }
-
-  function markAnimating() {
-    isAnimating = true;
-    animLockStartedAt = Date.now();
-  }
-
-  function clearAnimating() {
-    isAnimating = false;
-    animLockStartedAt = 0;
-  }
-
-  function recoverIfAnimationStuck() {
-    if (!isAnimating) return;
-    if (!animLockStartedAt) return;
-    if (Date.now() - animLockStartedAt < 2600) return;
-
-    // Failsafe: restore to a healthy interactive state.
-    clearAnimating();
-    sections.forEach(function (section, idx) {
-      section.classList.remove("prev", "wiper-top", "wiper-under");
-      section.classList.toggle("active", idx === currentSection);
-    });
-    if (wiperState) {
-      cleanupWiperTransition();
-    }
-  }
-
-  function isSweepPair(fromIdx, toIdx) {
-    // Projects (2) <-> Notes (3) and Notes (3) <-> Contact (4)
-    return (fromIdx === 2 && toIdx === 3) || (fromIdx === 3 && toIdx === 2) ||
-           (fromIdx === 3 && toIdx === 4) || (fromIdx === 4 && toIdx === 3);
-  }
-
-  function goToSection(index) {
-    recoverIfAnimationStuck();
-    if (isAnimating || index < 0 || index >= sections.length || index === currentSection) return;
-
-    var prevSection = sections[currentSection];
-    var nextSection = sections[index];
-
-    // Projects <-> Contact: full-screen left-to-right particle sweep
-    if (isSweepPair(currentSection, index)) {
-      startFullSweepTransition(currentSection, index);
-      return;
-    }
-
-    // Normal sections: minimal edge particle effect
-    triggerTransitionFX(index > currentSection ? 1 : -1);
-
-    markAnimating();
-    prevSection.classList.remove("active");
-    if (index > currentSection) {
-      prevSection.classList.add("prev");
-    } else {
-      prevSection.classList.remove("prev");
-    }
-
-    nextSection.classList.remove("prev");
-    nextSection.classList.add("active");
-
-    revealSection(nextSection);
-
-    currentSection = index;
-    updateUI();
-
-    setTimeout(function () {
-      clearAnimating();
-      prevSection.classList.remove("prev");
-    }, 700);
-  }
-
-  /* ==============================================
-     FULL-SCREEN SWEEP — Projects <-> Contact
-     Left matrix sweeps left->right then fades out
-     ============================================== */
-  function startFullSweepTransition(fromIdx, toIdx) {
-    try {
-      markAnimating();
-      var switched = false;
-      var showSweepStripe = false;
-
-    var themeColors = [
-      { r: 245, g: 230, b: 66 },  // hero: yellow
-      { r: 0,   g: 212, b: 255 }, // about: cyan
-      { r: 255, g: 43,  b: 94  }, // projects: red
-      { r: 200, g: 100, b: 255 }, // notes: purple
-      { r: 0,   g: 255, b: 140 }, // contact: green
-    ];
-
-    var fromCol = themeColors[fromIdx];
-    var toCol = themeColors[toIdx];
-
-    var prevSec = sections[fromIdx];
-    var nextSec = sections[toIdx];
-
-    // Keep current section visible; switch when sweep covers full screen.
-    var container = document.createElement("div");
-    container.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden";
-    document.body.appendChild(container);
-
-    // Create glitch overlay for sweep effect
-    var glitchOverlay = document.createElement("div");
-    glitchOverlay.style.cssText = "position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 0.1s";
-    container.appendChild(glitchOverlay);
-
-    // Create RGB split layers
-    var rgbLayerLeft = document.createElement("div");
-    rgbLayerLeft.style.cssText = "position:absolute;top:0;left:-4px;width:100%;height:100%;background:rgba(255,43,94,0.03);mix-blend-mode:screen;pointer-events:none";
-    container.appendChild(rgbLayerLeft);
-
-    var rgbLayerRight = document.createElement("div");
-    rgbLayerRight.style.cssText = "position:absolute;top:0;left:4px;width:100%;height:100%;background:rgba(0,212,255,0.03);mix-blend-mode:screen;pointer-events:none";
-    container.appendChild(rgbLayerRight);
-
-    var fxCanvas = createFxCanvas(container);
-    if (!fxCanvas) {
-      clearAnimating();
-      return;
-    }
-    var ctx = fxCanvas.ctx;
-    var W = fxCanvas.width;
-    var H = fxCanvas.height;
-
-    var matrixLeft = document.getElementById("matrix-left");
-    var matrixText = matrixLeft ? matrixLeft.textContent : "0101010101";
-    var glyphPool = [];
-    for (var gi = 0; gi < matrixText.length; gi++) {
-      var ch = matrixText.charAt(gi);
-      if (ch !== " " && ch !== "\n" && ch !== "\r" && ch !== "\t") {
-        glyphPool.push(ch);
-      }
-    }
-    if (!glyphPool.length) glyphPool = ["0", "1", "6", "*", "^"];
-
-    var tileCanvas = document.createElement("canvas");
-    var tileW = lowPowerFx ? 260 : 320;
-    tileCanvas.width = tileW;
-    tileCanvas.height = H;
-    var tileCtx = tileCanvas.getContext("2d");
-    var rowH = lowPowerFx ? 15 : 13;
-    var colW = lowPowerFx ? 12 : 10;
-    var rows = Math.ceil(H / rowH) + 2;
-    var cols = Math.ceil(tileW / colW) + 2;
-
-    function drawMachineTile(phase, tintColor) {
-      tileCtx.clearRect(0, 0, tileW, H);
-      tileCtx.font = (lowPowerFx ? "11px" : "12px") + " 'Share Tech Mono', monospace";
-      tileCtx.textBaseline = "top";
-      for (var y = 0; y < rows; y++) {
-        for (var x = 0; x < cols; x++) {
-          var idx = (x * 17 + y * 31 + Math.floor(phase * 90)) % glyphPool.length;
-          var char = glyphPool[idx];
-          var baseA = 0.08 + ((x + y) % 7) * 0.016;
-          var pulse = 0.45 + 0.55 * Math.sin((x * 0.38 + y * 0.25 + phase * 8.5));
-          var alpha = baseA * Math.max(0.15, pulse);
-          var rr = Math.min(255, tintColor.r + ((x + y) % 8 === 0 ? 18 : 0));
-          var gg = Math.min(255, tintColor.g + ((x + y) % 9 === 0 ? 14 : 0));
-          var bb = Math.min(255, tintColor.b + ((x + y) % 10 === 0 ? 16 : 0));
-          tileCtx.fillStyle = "rgba(" + rr + "," + gg + "," + bb + "," + alpha + ")";
-          tileCtx.fillText(char, x * colW, y * rowH);
-        }
-      }
-    }
-
-    var startTime = performance.now();
-    var duration = 1120;
-    var coverRatio = 0.55;
-
-    function frame(ts) {
-      try {
-      var elapsed = ts - startTime;
-      var progress = Math.min(elapsed / duration, 1);
-      var coverProgress = Math.min(progress / coverRatio, 1);
-      var dissolveProgress = progress <= coverRatio ? 0 : (progress - coverRatio) / (1 - coverRatio);
-
-      ctx.clearRect(0, 0, W, H);
-
-      var cr = Math.floor(fromCol.r + (toCol.r - fromCol.r) * progress);
-      var cg = Math.floor(fromCol.g + (toCol.g - fromCol.g) * progress);
-      var cb = Math.floor(fromCol.b + (toCol.b - fromCol.b) * progress);
-
-      if (!switched && coverProgress >= 1) {
-        switched = true;
-        prevSec.classList.remove("active", "prev");
-        nextSec.classList.remove("prev");
-        nextSec.classList.add("active");
-        currentSection = toIdx;
-        updateUI();
-        revealSection(nextSec);
-      }
-
-      var sweepFront = coverProgress * W;
-      var clearFront = dissolveProgress * W;
-      var visibleStart = progress < coverRatio ? 0 : clearFront;
-      var visibleEnd = sweepFront;
-      var visibleWidth = Math.max(0, visibleEnd - visibleStart);
-
-      drawMachineTile(progress, { r: cr, g: cg, b: cb });
-
-      if (visibleWidth > 0) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(visibleStart, 0, visibleWidth, H);
-        ctx.clip();
-
-        var pattern = ctx.createPattern(tileCanvas, "repeat");
-        ctx.translate(-((progress * 120) % tileW), 0);
-        ctx.fillStyle = pattern;
-        ctx.fillRect(visibleStart - tileW, 0, visibleWidth + tileW * 2, H);
-
-        var grainA = 0.05 + (1 - dissolveProgress) * 0.08;
-        ctx.fillStyle = "rgba(0,0,0," + (0.35 - grainA) + ")";
-        ctx.fillRect(visibleStart, 0, visibleWidth, H);
-        ctx.restore();
-
-        if (showSweepStripe) {
-          var edgeX = progress < coverRatio ? sweepFront : clearFront;
-          var edgeA = 0.58 * (1 - dissolveProgress * 0.7);
-          var grad = ctx.createLinearGradient(edgeX - 38, 0, edgeX + 18, 0);
-          grad.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0)");
-          grad.addColorStop(0.42, "rgba(" + Math.min(cr + 35, 255) + "," + Math.min(cg + 30, 255) + "," + Math.min(cb + 35, 255) + "," + (edgeA * 0.6) + ")");
-          grad.addColorStop(0.6, "rgba(255,255,255," + edgeA + ")");
-          grad.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
-          ctx.fillStyle = grad;
-          ctx.fillRect(edgeX - 38, 0, 56, H);
-        }
-      }
-
-      if (progress < 1) {
-        // Update glitch overlay with horizontal scan lines
-        var glitchIntensity = progress < 0.5 ? progress * 0.4 : (1 - progress) * 0.8;
-        glitchOverlay.style.opacity = glitchIntensity;
-        glitchOverlay.style.background = "repeating-linear-gradient(0deg,transparent," +
-          "transparent " + Math.floor(Math.random() * 4 + 2) + "px," +
-          "rgba(" + cr + "," + cg + "," + cb + "," + (glitchIntensity * 0.3) + ") " +
-          Math.floor(Math.random() * 4 + 2) + "px)";
-
-        // Animate RGB split layers
-        var rgbOffset = Math.sin(progress * Math.PI * 4) * 6;
-        rgbLayerLeft.style.transform = "translateX(" + (-4 + rgbOffset) + "px)";
-        rgbLayerRight.style.transform = "translateX(" + (4 - rgbOffset) + "px)";
-
-        // Add random horizontal glitch bars
-        if (Math.random() < 0.15) {
-          var bar = document.createElement("div");
-          bar.style.cssText = "position:absolute;left:0;top:" + (Math.random() * 100) + "%;width:100%;height:" +
-            (2 + Math.random() * 8) + "px;background:rgba(255,255,255," + (0.1 + Math.random() * 0.2) + ")";
-          glitchOverlay.appendChild(bar);
-          setTimeout(function() { if (bar.parentNode) bar.parentNode.removeChild(bar); }, 100);
-        }
-
-        requestAnimationFrame(frame);
-      } else {
-        if (!switched) {
-          prevSec.classList.remove("active", "prev");
-          nextSec.classList.remove("prev");
-          nextSec.classList.add("active");
-          currentSection = toIdx;
-          updateUI();
-          revealSection(nextSec);
-        }
-        if (container.parentNode) container.parentNode.removeChild(container);
-        clearAnimating();
-      }
-      } catch (err) {
-        console.error("Sweep frame error:", err);
-        if (container.parentNode) container.parentNode.removeChild(container);
-        clearAnimating();
-        prevSec.classList.remove("active", "prev");
-        nextSec.classList.remove("prev");
-        nextSec.classList.add("active");
-        currentSection = toIdx;
-        updateUI();
-        revealSection(nextSec);
-      }
-    }
-
-    requestAnimationFrame(frame);
-    } catch (err) {
-      console.error("Sweep transition error:", err);
-      clearAnimating();
-      // Fallback: just switch sections directly
-      prevSec.classList.remove("active", "prev");
-      nextSec.classList.remove("prev");
-      nextSec.classList.add("active");
-      currentSection = toIdx;
-      updateUI();
-      revealSection(nextSec);
-    }
-  }
-
-  function isWiperPair(fromIdx, toIdx) {
-    return (fromIdx === 1 && toIdx === 2) || (fromIdx === 2 && toIdx === 1);
-  }
-
-  function clearWiperMask(section) {
-    section.style.webkitMaskImage = "";
-    section.style.maskImage = "";
-    section.style.webkitMaskRepeat = "";
-    section.style.maskRepeat = "";
-    section.style.webkitMaskMode = "";
-    section.style.maskMode = "";
-  }
-
-  function applyWiperMask() {
-    if (!wiperState) return;
-    var sweepDeg = Math.max(0.5, wiperState.progress * wiperState.sweepRange);
-    var edgeSoft = 2.2;
-    var edgeMid = Math.min(360, sweepDeg + edgeSoft * 0.6);
-    var edgeEnd = Math.min(360, sweepDeg + edgeSoft);
-    var mask =
-      "conic-gradient(from " + wiperState.startAngle + "deg at 0% 50%, " +
-      "rgba(255,255,255,0) 0deg " + sweepDeg + "deg, " +
-      "rgba(255,255,255,0.16) " + sweepDeg + "deg " + edgeMid + "deg, " +
-      "rgba(255,255,255,1) " + edgeEnd + "deg 360deg)";
-    wiperState.prevSection.style.webkitMaskImage = mask;
-    wiperState.prevSection.style.maskImage = mask;
-    wiperState.prevSection.style.webkitMaskRepeat = "no-repeat";
-    wiperState.prevSection.style.maskRepeat = "no-repeat";
-    wiperState.prevSection.style.webkitMaskMode = "alpha";
-    wiperState.prevSection.style.maskMode = "alpha";
-
-    var bladeAngle = wiperState.startAngle + sweepDeg;
-    if (wiperState.blade) {
-      wiperState.blade.style.transform = "rotate(" + bladeAngle + "deg)";
-    }
-  }
-
-  function cleanupWiperTransition() {
-    if (!wiperState) return;
-    if (wiperState.rafId) {
-      cancelAnimationFrame(wiperState.rafId);
-      wiperState.rafId = 0;
-    }
-    clearWiperMask(wiperState.prevSection);
-    wiperState.prevSection.classList.remove("wiper-top");
-    wiperState.nextSection.classList.remove("wiper-under");
-    if (wiperState.blade && wiperState.blade.parentNode) {
-      wiperState.blade.parentNode.removeChild(wiperState.blade);
-    }
-    document.body.classList.remove("is-wiper-transition");
-    wiperState = null;
-  }
-
-  function stepWiperTransition(ts) {
-    if (!wiperState) return;
-
-    var dt = wiperState.lastTs ? (ts - wiperState.lastTs) : 16;
-    wiperState.lastTs = ts;
-
-    var diff = wiperState.targetProgress - wiperState.progress;
-    var alpha = Math.max(0.1, Math.min(0.42, dt / 55));
-    wiperState.progress += diff * alpha;
-
-    if (Math.abs(diff) < 0.0012) {
-      wiperState.progress = wiperState.targetProgress;
-    }
-
-    wiperState.progress = Math.max(0, Math.min(1, wiperState.progress));
-    applyWiperMask();
-
-    if (wiperState.targetProgress >= 1 && wiperState.progress >= 0.999) {
-      finishWiperTransition();
-      return;
-    }
-
-    if (wiperState.targetProgress <= 0 && wiperState.progress <= 0.001) {
-      cancelWiperTransition();
-      return;
-    }
-
-    if (Math.abs(wiperState.targetProgress - wiperState.progress) > 0.0008) {
-      wiperState.rafId = requestAnimationFrame(stepWiperTransition);
-    } else {
-      wiperState.rafId = 0;
-      wiperState.lastTs = 0;
-    }
-  }
-
-  function ensureWiperTransitionLoop() {
-    if (!wiperState || wiperState.rafId) return;
-    wiperState.rafId = requestAnimationFrame(stepWiperTransition);
-  }
-
-  function cancelWiperTransition() {
-    if (!wiperState) return;
-    wiperState.nextSection.classList.remove("active", "prev");
-    wiperState.prevSection.classList.add("active");
-    cleanupWiperTransition();
-    clearAnimating();
-    wheelAccum = 0;
-    lastWheelDir = 0;
-  }
-
-  function finishWiperTransition() {
-    if (!wiperState) return;
-    var prevSection = wiperState.prevSection;
-    var nextSection = wiperState.nextSection;
-
-    prevSection.classList.remove("active", "prev");
-    nextSection.classList.add("active");
-
-    currentSection = wiperState.toIndex;
-    cleanupWiperTransition();
-    updateUI();
-    revealSection(nextSection);
-    clearAnimating();
-    wheelAccum = 0;
-    lastWheelDir = 0;
-  }
-
-  function startWiperTransition(targetIndex) {
-    var prevSection = sections[currentSection];
-    var nextSection = sections[targetIndex];
-
-    markAnimating();
-    wiperState = {
-      fromIndex: currentSection,
-      toIndex: targetIndex,
-      progress: 0,
-      targetProgress: 0,
-      startAngle: -112,
-      sweepRange: 284,
-      prevSection: prevSection,
-      nextSection: nextSection,
-      blade: null,
-      rafId: 0,
-      lastTs: 0,
-    };
-
-    document.body.classList.add("is-wiper-transition");
-    nextSection.classList.remove("prev");
-    nextSection.classList.add("active", "wiper-under");
-    prevSection.classList.add("wiper-top");
-    applyWiperMask();
-  }
-
-  function updateWiperByWheelDelta(delta) {
-    if (!wiperState) return;
-    var towardTarget = wiperState.toIndex > wiperState.fromIndex ? 1 : -1;
-    wiperState.targetProgress += (delta * towardTarget) / 520;
-    wiperState.targetProgress = Math.max(0, Math.min(1, wiperState.targetProgress));
-    ensureWiperTransitionLoop();
   }
 
   function revealSection(section) {
@@ -928,359 +455,99 @@
     items.forEach(function (item) {
       item.classList.remove("revealed");
       void item.offsetWidth;
-      setTimeout(function () { item.classList.add("revealed"); }, 50);
+      setTimeout(function () {
+        item.classList.add("revealed");
+      }, 40);
     });
   }
 
-  /* ==============================================
-     ADVANCED CYBERPUNK TRANSITION FX
-     Glitch flash + chromatic aberration + data streams
-     ============================================== */
-  function triggerTransitionFX(direction) {
-    var nextIdx = currentSection + direction;
-    nextIdx = Math.max(0, Math.min(nextIdx, sections.length - 1));
-
-    var themeColors = [
-      { r: 245, g: 230, b: 66 },  // hero: yellow
-      { r: 0,   g: 212, b: 255 }, // about: cyan
-      { r: 255, g: 43,  b: 94  }, // projects: red
-      { r: 200, g: 100, b: 255 }, // notes: purple
-      { r: 0,   g: 255, b: 140 }, // contact: green
-    ];
-
-    var fromCol = themeColors[currentSection];
-    var toCol = themeColors[nextIdx];
-
-    // Create main container
-    var container = document.createElement("div");
-    container.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden";
-    document.body.appendChild(container);
-
-    // Create glitch flash overlay
-    var flashOverlay = document.createElement("div");
-    flashOverlay.style.cssText = "position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,43,94,0.3),rgba(0,212,255,0.3),rgba(245,230,66,0.3));mix-blend-mode:screen;opacity:0;pointer-events:none";
-    container.appendChild(flashOverlay);
-
-    // Create scan lines container
-    var scanContainer = document.createElement("div");
-    scanContainer.style.cssText = "position:absolute;inset:0;pointer-events:none;overflow:hidden";
-    container.appendChild(scanContainer);
-
-    var fxCanvas = createFxCanvas(container);
-    if (!fxCanvas) return;
-    var ctx = fxCanvas.ctx;
-    var W = fxCanvas.width;
-    var H = fxCanvas.height;
-
-    // === Enhanced particle system with RGB split ===
-    function spawnParticle(side) {
-      var onLeft = side === "left";
-      var baseX = onLeft ? Math.random() * 80 : W - 80 + Math.random() * 80;
-      var speedY = (2 + Math.random() * 5) * (direction > 0 ? 1 : -1);
-      return {
-        x: baseX,
-        y: Math.random() * H,
-        vx: (onLeft ? 1 : -1) * (0.5 + Math.random() * 1.5),
-        vy: speedY,
-        size: 1 + Math.random() * 2.5,
-        life: 0.4 + Math.random() * 0.6,
-        decay: 0.008 + Math.random() * 0.015,
-        hue: Math.random(),
-        trail: [],
-      };
+  function updateUI() {
+    dots.forEach(function (dot) {
+      dot.classList.toggle("active", Number(dot.dataset.target) === currentSection);
+    });
+    document.querySelectorAll(".counter-current").forEach(function (el) {
+      el.textContent = String(currentSection + 1).padStart(2, "0");
+    });
+    if (window._setMatrixTheme) {
+      window._setMatrixTheme(Math.min(currentSection, 4));
     }
-
-    var particles = [];
-    var particleCount = Math.max(50, Math.floor((W / 18) * fxIntensity));
-    for (var p = 0; p < particleCount; p++) {
-      particles.push(spawnParticle(p % 2 === 0 ? "left" : "right"));
-    }
-
-    // === Data stream streaks ===
-    function spawnStreak(side) {
-      var onLeft = side === "left";
-      return {
-        x: onLeft ? Math.random() * 100 : W - 100 + Math.random() * 100,
-        y: Math.random() * H,
-        len: 20 + Math.random() * 50,
-        speed: (3 + Math.random() * 6) * (direction > 0 ? 1 : -1),
-        life: 0.5 + Math.random() * 0.5,
-        decay: 0.012 + Math.random() * 0.015,
-        chars: "!@#$%^&*()+=0123456789<>?/\\|~`",
-      };
-    }
-
-    var streaks = [];
-    for (var s = 0; s < Math.max(15, Math.floor(20 * fxIntensity)); s++) {
-      streaks.push(spawnStreak(s % 2 === 0 ? "left" : "right"));
-    }
-
-    // === Glitch lines ===
-    var glitchLines = [];
-    function spawnGlitchLine() {
-      return {
-        y: Math.random() * H,
-        height: 2 + Math.random() * 8,
-        x: Math.random() * W,
-        width: Math.random() * W * 0.6,
-        life: 0.15 + Math.random() * 0.2,
-        speed: (Math.random() - 0.5) * 20,
-        isHorizontal: Math.random() > 0.7,
-      };
-    }
-
-    for (var g = 0; g < 8; g++) {
-      glitchLines.push(spawnGlitchLine());
-    }
-
-    var startTime = performance.now();
-    var duration = 550;
-
-    function frame(ts) {
-      var elapsed = ts - startTime;
-      var progress = Math.min(elapsed / duration, 1);
-      var envelope = Math.sin(progress * Math.PI); // 0->1->0
-      var glitchIntensity = progress < 0.3 ? (1 - progress / 0.3) : 0;
-
-      ctx.clearRect(0, 0, W, H);
-
-      var cr = Math.floor(fromCol.r + (toCol.r - fromCol.r) * progress);
-      var cg = Math.floor(fromCol.g + (toCol.g - fromCol.g) * progress);
-      var cb = Math.floor(fromCol.g - fromCol.g + toCol.b - fromCol.b) * progress + fromCol.b;
-
-      // === Draw RGB split particles ===
-      for (var i = 0; i < particles.length; i++) {
-        var pt = particles[i];
-        pt.x += pt.vx;
-        pt.y += pt.vy;
-        pt.life -= pt.decay;
-
-        if (pt.life <= 0 || pt.y < -30 || pt.y > H + 30) {
-          particles[i] = spawnParticle(i % 2 === 0 ? "left" : "right");
-          pt = particles[i];
-        }
-
-        var pa = envelope * pt.life * 0.85;
-        if (pa < 0.02) continue;
-
-        // RGB split effect - draw 3 particles offset
-        var offset = 3 + glitchIntensity * 6;
-        ctx.globalAlpha = pa;
-        // Red channel (left)
-        ctx.fillStyle = "rgba(255,43,94," + pa + ")";
-        ctx.fillRect(pt.x - offset, pt.y, pt.size, pt.size);
-        // Green channel (center)
-        ctx.fillStyle = "rgba(0,255," + Math.floor(140 + progress * 115) + "," + pa + ")";
-        ctx.fillRect(pt.x, pt.y, pt.size, pt.size);
-        // Blue channel (right)
-        ctx.fillStyle = "rgba(0,212,255," + pa + ")";
-        ctx.fillRect(pt.x + offset, pt.y, pt.size, pt.size);
-        ctx.globalAlpha = 1;
-      }
-
-      // === Draw data stream streaks ===
-      ctx.font = (lowPowerFx ? "10px" : "12px") + " 'Share Tech Mono', monospace";
-      ctx.textBaseline = "top";
-      for (var j = 0; j < streaks.length; j++) {
-        var st = streaks[j];
-        st.y += st.speed;
-        st.life -= 0.01;
-        if (st.life <= 0 || st.y < -60 || st.y > H + 60) {
-          streaks[j] = spawnStreak(j % 2 === 0 ? "left" : "right");
-          st = streaks[j];
-        }
-        var sa = envelope * st.life * 0.7;
-        if (sa < 0.02) continue;
-        ctx.fillStyle = "rgba(" + Math.min(cr + 40, 255) + "," + Math.min(cg + 40, 255) + "," + Math.min(cb + 40, 255) + "," + sa + ")";
-        var charLen = Math.min(Math.floor(st.len / 8), 8);
-        for (var c = 0; c < charLen; c++) {
-          var ch = st.chars[(Math.floor(st.y / 12) + c) % st.chars.length];
-          ctx.fillText(ch, st.x, st.y - c * 12);
-        }
-      }
-
-      // === Draw glitch lines ===
-      if (glitchIntensity > 0.1) {
-        for (var k = 0; k < glitchLines.length; k++) {
-          var gl = glitchLines[k];
-          gl.y += gl.speed;
-          gl.life -= 0.03;
-          if (gl.life <= 0) {
-            glitchLines[k] = spawnGlitchLine();
-            gl = glitchLines[k];
-          }
-          var gla = glitchIntensity * gl.life * 0.8;
-          if (gla < 0.05) continue;
-
-          // Draw RGB split glitch line
-          ctx.fillStyle = "rgba(255,43,94," + gla + ")";
-          ctx.fillRect(gl.x - 4, gl.y, gl.width, gl.height);
-          ctx.fillStyle = "rgba(0,212,255," + gla + ")";
-          ctx.fillRect(gl.x + 4, gl.y, gl.width, gl.height);
-          ctx.fillStyle = "rgba(" + cr + "," + cg + "," + cb + "," + gla + ")";
-          ctx.fillRect(gl.x, gl.y, gl.width, gl.height);
-        }
-      }
-
-      // === Edge glow ring ===
-      var edgeGlow = envelope * 0.3 * (1 - progress * 0.5);
-      var edgeWidth = 40 + glitchIntensity * 30;
-      // Top edge
-      var gradTop = ctx.createLinearGradient(0, 0, 0, edgeWidth);
-      gradTop.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + "," + edgeGlow + ")");
-      gradTop.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
-      ctx.fillStyle = gradTop;
-      ctx.fillRect(0, 0, W, edgeWidth);
-      // Bottom edge
-      var gradBot = ctx.createLinearGradient(0, H - edgeWidth, 0, H);
-      gradBot.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0)");
-      gradBot.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + "," + edgeGlow + ")");
-      ctx.fillStyle = gradBot;
-      ctx.fillRect(0, H - edgeWidth, W, edgeWidth);
-
-      // === Glitch flash overlay ===
-      flashOverlay.style.opacity = glitchIntensity * 0.4;
-      flashOverlay.style.transform = "translateX(" + (Math.random() - 0.5) * glitchIntensity * 10 + "px)";
-
-      // === Horizontal scan line effect ===
-      if (Math.random() < 0.3 * glitchIntensity) {
-        var scanY = Math.random() * H;
-        var scanH = 2 + Math.random() * 6;
-        ctx.fillStyle = "rgba(255,255,255," + (0.1 + Math.random() * 0.2) * glitchIntensity + ")";
-        ctx.fillRect(0, scanY, W, scanH);
-      }
-
-      if (progress < 1) {
-        requestAnimationFrame(frame);
-      } else if (container.parentNode) {
-        container.parentNode.removeChild(container);
-      }
-    }
-
-    requestAnimationFrame(frame);
+    applyTheme(currentSection);
   }
 
-  sections[0].classList.add("active");
+  function goToSection(index) {
+    if (isAnimating) return;
+    if (index < 0 || index >= sections.length || index === currentSection) return;
+
+    var prev = sections[currentSection];
+    var next = sections[index];
+    isAnimating = true;
+
+    prev.classList.remove("active");
+    prev.classList.toggle("prev", index > currentSection);
+    next.classList.remove("prev");
+    next.classList.add("active");
+
+    currentSection = index;
+    updateUI();
+    revealSection(next);
+
+    setTimeout(function () {
+      prev.classList.remove("prev");
+      isAnimating = false;
+    }, 700);
+  }
+
+  sections.forEach(function (section, idx) {
+    section.classList.remove("active", "prev", "wiper-top", "wiper-under");
+    if (idx === 0) section.classList.add("active");
+  });
   revealSection(sections[0]);
-  applyTheme(0);
   updateUI();
 
-  // ---- Wheel ----
-  var lastWheelDir = 0;
-  var wheelDebounce = null;
-
   document.addEventListener("wheel", function (e) {
-    recoverIfAnimationStuck();
     e.preventDefault();
-
-    var delta = e.deltaY || e.detail || -e.wheelDelta;
-    var dir = delta > 0 ? 1 : delta < 0 ? -1 : 0;
-
-    if (wiperState) {
-      updateWiperByWheelDelta(delta);
-      return;
-    }
-
-    var targetIndex = currentSection + dir;
-    if (!isAnimating && dir !== 0 && isWiperPair(currentSection, targetIndex)) {
-      startWiperTransition(targetIndex);
-      updateWiperByWheelDelta(delta);
-      return;
-    }
-
-    // Reset if direction changed
-    if (dir !== 0 && dir !== lastWheelDir) {
-      wheelAccum = 0;
-      lastWheelDir = dir;
-      clearTimeout(wheelDebounce);
-      wheelDebounce = setTimeout(function () { lastWheelDir = 0; }, 400);
-    }
-
+    var delta = e.deltaY || e.detail || -e.wheelDelta || 0;
     wheelAccum += delta;
-
-    if (wheelAccum > 50) {
+    if (wheelAccum >= WHEEL_THRESHOLD) {
       goToSection(currentSection + 1);
       wheelAccum = 0;
-      lastWheelDir = 0;
-      clearTimeout(wheelDebounce);
-    } else if (wheelAccum < -50) {
+    } else if (wheelAccum <= -WHEEL_THRESHOLD) {
       goToSection(currentSection - 1);
       wheelAccum = 0;
-      lastWheelDir = 0;
-      clearTimeout(wheelDebounce);
     }
   }, { passive: false });
 
-  // ---- Keyboard ----
   document.addEventListener("keydown", function (e) {
-    recoverIfAnimationStuck();
     if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
-      e.preventDefault(); goToSection(currentSection + 1);
+      e.preventDefault();
+      goToSection(currentSection + 1);
     } else if (e.key === "ArrowUp" || e.key === "PageUp") {
-      e.preventDefault(); goToSection(currentSection - 1);
+      e.preventDefault();
+      goToSection(currentSection - 1);
     } else if (e.key === "Home") {
-      e.preventDefault(); goToSection(0);
+      e.preventDefault();
+      goToSection(0);
     } else if (e.key === "End") {
-      e.preventDefault(); goToSection(sections.length - 1);
+      e.preventDefault();
+      goToSection(sections.length - 1);
     }
   });
 
-  // ---- Dots ----
   dots.forEach(function (dot) {
     dot.addEventListener("click", function () {
-      recoverIfAnimationStuck();
-      var target = parseInt(this.getAttribute("data-target"), 10);
-      goToSection(target);
+      var target = Number(dot.dataset.target);
+      if (!Number.isNaN(target)) goToSection(target);
     });
   });
 
-  // ---- Nav ----
   document.querySelectorAll(".nav-link").forEach(function (link) {
     link.addEventListener("click", function (e) {
-      recoverIfAnimationStuck();
       e.preventDefault();
-      var href = this.getAttribute("href");
-      var sectionIndex = 0;
-      if (href === "#about") sectionIndex = 1;
-      else if (href === "#projects") sectionIndex = 2;
-      else if (href === "#notes") sectionIndex = 3;
-      else if (href === "#contact") sectionIndex = 4;
-      goToSection(sectionIndex);
+      var href = link.getAttribute("href");
+      var map = { "#about": 1, "#projects": 2, "#notes": 3, "#contact": 4 };
+      goToSection(map[href] ?? 0);
     });
   });
-
-  // ---- Touch ----
-  var touchStartY = 0, touchStartTime = 0;
-  var touchStartSection = null;
-  document.addEventListener("touchstart", function (e) {
-    touchStartY = e.touches[0].clientY;
-    touchStartTime = Date.now();
-    touchStartSection = document.querySelector(".scroll-section.active");
-  }, { passive: true });
-  document.addEventListener("touchend", function (e) {
-    var deltaY = touchStartY - e.changedTouches[0].clientY;
-    var deltaTime = Date.now() - touchStartTime;
-    if (Math.abs(deltaY) <= 40 || deltaTime >= 500) return;
-
-    // On mobile, allow reading long content first.
-    // Section switching happens only at top/bottom edges.
-    if (touchStartSection) {
-      var canScroll = touchStartSection.scrollHeight > touchStartSection.clientHeight + 2;
-      if (canScroll) {
-        var atTop = touchStartSection.scrollTop <= 4;
-        var atBottom = touchStartSection.scrollTop + touchStartSection.clientHeight >= touchStartSection.scrollHeight - 4;
-        if (deltaY > 0 && !atBottom) return;
-        if (deltaY < 0 && !atTop) return;
-      }
-    }
-
-    if (deltaY > 0) {
-      goToSection(currentSection + 1);
-    } else {
-      goToSection(currentSection - 1);
-    }
-  }, { passive: true });
-
 })();
 
 
