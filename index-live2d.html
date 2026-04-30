@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Audiowide&family=Monoton&family=Orbitron:wght@600;700;800;900&family=Oxanium:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Teko:wght@500;600;700&family=Rajdhani:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./style-live2d.css" />
   </head>
   <body>
     <!-- ASCII Matrix -->
@@ -55,10 +55,7 @@
       <section class="scroll-section hero-section" data-section="0">
         <div class="crt-overlay">
           <div class="crt-glow"></div>
-          <div class="crt-rgb-grid"></div>
           <div class="crt-moire"></div>
-          <div class="crt-noise"></div>
-          <div class="crt-roll"></div>
           <div class="crt-distortion"></div>
         </div>
         <div class="hero-inner">
@@ -135,9 +132,49 @@
                   <span class="abstract-scan abstract-scan--one"></span>
                   <span class="abstract-scan abstract-scan--two"></span>
                 </div>
-                <img class="hero-visual-glitch hero-visual-glitch--cyan" src="./assets/asuka-chibi-hero.png" alt="" />
-                <img class="hero-visual-glitch hero-visual-glitch--magenta" src="./assets/asuka-chibi-hero.png" alt="" />
-                <img class="hero-visual-image" src="./assets/asuka-chibi-hero.png" alt="Chibi maid Asuka hero art" />
+                <div class="live2d-stage">
+                  <div class="live2d-shell live2d-shell--cyan">
+                    <img class="live2d-part live2d-part--full" src="./assets/live2d/full.png" alt="" />
+                  </div>
+                  <div class="live2d-shell live2d-shell--magenta">
+                    <img class="live2d-part live2d-part--full" src="./assets/live2d/full.png" alt="" />
+                  </div>
+
+                  <div class="live2d-rig">
+                    <div class="live2d-body-bounce">
+                      <img class="live2d-part live2d-part--base" src="./assets/live2d/base.png" alt="Animated chibi maid character" />
+                      <img class="live2d-part live2d-part--torso" src="./assets/live2d/torso.png" alt="" />
+                      <img class="live2d-part live2d-part--skirt" src="./assets/live2d/skirt.png" alt="" />
+                      <img class="live2d-part live2d-part--mouth" src="./assets/live2d/mouth.png" alt="" />
+                      <img class="live2d-part live2d-part--iris-left" src="./assets/live2d/iris_left.png" alt="" />
+                      <img class="live2d-part live2d-part--iris-right" src="./assets/live2d/iris_right.png" alt="" />
+
+                      <div class="live2d-head-sway">
+                        <img class="live2d-part live2d-part--bang-left" src="./assets/live2d/bang_left.png" alt="" />
+                        <img class="live2d-part live2d-part--bang-center" src="./assets/live2d/bang_center.png" alt="" />
+                        <img class="live2d-part live2d-part--bang-right" src="./assets/live2d/bang_right.png" alt="" />
+                        <img class="live2d-part live2d-part--hair-left" src="./assets/live2d/hair_left.png" alt="" />
+                        <img class="live2d-part live2d-part--hair-right" src="./assets/live2d/hair_right.png" alt="" />
+                      </div>
+
+                      <div class="live2d-accessory live2d-accessory--left">
+                        <img class="live2d-part live2d-part--earring-left" src="./assets/live2d/earring_left.png" alt="" />
+                      </div>
+                      <div class="live2d-accessory live2d-accessory--right">
+                        <img class="live2d-part live2d-part--earring-right" src="./assets/live2d/earring_right.png" alt="" />
+                      </div>
+
+                      <div class="live2d-eye live2d-eye--left"></div>
+                      <div class="live2d-eye live2d-eye--right"></div>
+                    </div>
+                  </div>
+
+                  <div class="live2d-shadow"></div>
+                  <div class="live2d-caption">
+                    <span class="live2d-caption-line"></span>
+                    <span class="live2d-caption-text">LIVE2D IDLE PROTOTYPE</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -443,6 +480,6 @@
 
     </div>
 
-    <script src="./script.js"></script>
+    <script src="./script-live2d.js"></script>
   </body>
 </html>

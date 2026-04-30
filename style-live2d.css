@@ -356,6 +356,259 @@
   transform: translate(calc(-50% + 8px), calc(-52% - 2px));
 }
 
+.scroll-section[data-section="0"] .live2d-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+  --blink: 1;
+  --blink-closure: 0;
+  --gaze-x: 0px;
+  --gaze-y: 0px;
+  --breath-y: 0px;
+  --float-y: 0px;
+  --body-r: 0deg;
+  --body-sx: 1;
+  --body-sy: 1;
+  --bounce-y: 0px;
+  --head-x: 0px;
+  --head-y: 0px;
+  --head-r: 0deg;
+  --bang-left-x: 0px;
+  --bang-left-y: 0px;
+  --bang-left-r: 0deg;
+  --bang-center-x: 0px;
+  --bang-center-y: 0px;
+  --bang-center-r: 0deg;
+  --bang-right-x: 0px;
+  --bang-right-y: 0px;
+  --bang-right-r: 0deg;
+  --hair-left-x: 0px;
+  --hair-left-y: 0px;
+  --hair-left-r: 0deg;
+  --hair-right-x: 0px;
+  --hair-right-y: 0px;
+  --hair-right-r: 0deg;
+  --earring-left-r: 0deg;
+  --earring-right-r: 0deg;
+  --earring-left-y: 0px;
+  --earring-right-y: 0px;
+  --torso-y: 0px;
+  --torso-sy: 1;
+  --skirt-x: 0px;
+  --skirt-y: 0px;
+  --skirt-r: 0deg;
+  --mouth-y: 0px;
+  --mouth-sy: 1;
+}
+
+.scroll-section[data-section="0"] .live2d-shell,
+.scroll-section[data-section="0"] .live2d-rig {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(112%, 650px);
+  aspect-ratio: 1581 / 1386;
+}
+
+.scroll-section[data-section="0"] .live2d-shell {
+  transform: translate(-50%, -52%);
+  opacity: 0.34;
+  mix-blend-mode: screen;
+}
+
+.scroll-section[data-section="0"] .live2d-shell--cyan {
+  filter: hue-rotate(170deg) saturate(1.35) brightness(1.1);
+  transform: translate(calc(-50% - 8px), calc(-52% + 2px));
+}
+
+.scroll-section[data-section="0"] .live2d-shell--magenta {
+  filter: hue-rotate(-55deg) saturate(1.45) brightness(1.06);
+  transform: translate(calc(-50% + 8px), calc(-52% - 2px));
+}
+
+.scroll-section[data-section="0"] .live2d-rig {
+  transform:
+    translate(-50%, -52%)
+    translate3d(0, calc(var(--breath-y) + var(--float-y)), 0)
+    rotate(var(--body-r))
+    scale(var(--body-sx), var(--body-sy));
+  will-change: transform;
+}
+
+.scroll-section[data-section="0"] .live2d-body-bounce,
+.scroll-section[data-section="0"] .live2d-head-sway,
+.scroll-section[data-section="0"] .live2d-accessory {
+  position: absolute;
+  inset: 0;
+}
+
+.scroll-section[data-section="0"] .live2d-body-bounce {
+  transform: translate3d(0, var(--bounce-y), 0);
+}
+
+.scroll-section[data-section="0"] .live2d-head-sway {
+  transform: translate(var(--head-x), var(--head-y)) rotate(var(--head-r));
+  transform-origin: 50% 34%;
+}
+
+.scroll-section[data-section="0"] .live2d-accessory--left,
+.scroll-section[data-section="0"] .live2d-accessory--right {
+  transform-origin: 50% 10%;
+}
+
+.scroll-section[data-section="0"] .live2d-accessory--left {
+  transform: translateY(var(--earring-left-y)) rotate(var(--earring-left-r));
+}
+
+.scroll-section[data-section="0"] .live2d-accessory--right {
+  transform: translateY(var(--earring-right-y)) rotate(var(--earring-right-r));
+}
+
+.scroll-section[data-section="0"] .live2d-part {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.scroll-section[data-section="0"] .live2d-part--base,
+.scroll-section[data-section="0"] .live2d-part--full {
+  filter:
+    drop-shadow(0 0 12px rgba(245, 230, 66, 0.2))
+    drop-shadow(10px 0 0 rgba(255, 43, 94, 0.12))
+    drop-shadow(-8px 0 0 rgba(0, 212, 255, 0.12))
+    drop-shadow(0 24px 34px rgba(0, 0, 0, 0.34));
+}
+
+.scroll-section[data-section="0"] .live2d-part--torso {
+  transform: translateY(var(--torso-y)) scaleY(var(--torso-sy));
+  transform-origin: 50% 62%;
+}
+
+.scroll-section[data-section="0"] .live2d-part--skirt {
+  transform: translate(var(--skirt-x), var(--skirt-y)) rotate(var(--skirt-r));
+  transform-origin: 50% 8%;
+}
+
+.scroll-section[data-section="0"] .live2d-part--mouth {
+  transform: translateY(var(--mouth-y)) scaleY(var(--mouth-sy));
+  transform-origin: 50% 50%;
+}
+
+.scroll-section[data-section="0"] .live2d-part--iris-left,
+.scroll-section[data-section="0"] .live2d-part--iris-right {
+  opacity: 0.96;
+  transform: translate(var(--gaze-x), var(--gaze-y));
+}
+
+.scroll-section[data-section="0"] .live2d-part--bang-left {
+  transform: translate(var(--bang-left-x), var(--bang-left-y)) rotate(var(--bang-left-r));
+  transform-origin: 65% 12%;
+}
+
+.scroll-section[data-section="0"] .live2d-part--bang-center {
+  transform: translate(var(--bang-center-x), var(--bang-center-y)) rotate(var(--bang-center-r));
+  transform-origin: 50% 8%;
+}
+
+.scroll-section[data-section="0"] .live2d-part--bang-right {
+  transform: translate(var(--bang-right-x), var(--bang-right-y)) rotate(var(--bang-right-r));
+  transform-origin: 35% 12%;
+}
+
+.scroll-section[data-section="0"] .live2d-part--hair-left {
+  transform: translate(var(--hair-left-x), var(--hair-left-y)) rotate(var(--hair-left-r));
+  transform-origin: 56% 22%;
+}
+
+.scroll-section[data-section="0"] .live2d-part--hair-right {
+  transform: translate(var(--hair-right-x), var(--hair-right-y)) rotate(var(--hair-right-r));
+  transform-origin: 44% 22%;
+}
+
+.scroll-section[data-section="0"] .live2d-eye {
+  position: absolute;
+  top: 38.2%;
+  width: 13.8%;
+  height: 10.8%;
+  overflow: hidden;
+  border-radius: 999px;
+  opacity: calc(0.18 + var(--blink-closure) * 0.98);
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.4));
+}
+
+.scroll-section[data-section="0"] .live2d-eye--left { left: 27.9%; }
+.scroll-section[data-section="0"] .live2d-eye--right { left: 58.1%; }
+
+.scroll-section[data-section="0"] .live2d-eye::before,
+.scroll-section[data-section="0"] .live2d-eye::after {
+  content: "";
+  position: absolute;
+  left: -6%;
+  width: 112%;
+  height: 92%;
+  background: linear-gradient(180deg, #f6ddd8 0%, #feece7 60%, #fff3ee 100%);
+}
+
+.scroll-section[data-section="0"] .live2d-eye::before {
+  top: -68%;
+  border-bottom: 0.42rem solid #0d0c10;
+  border-radius: 0 0 999px 999px;
+  transform: translateY(calc(var(--blink-closure) * 78%));
+}
+
+.scroll-section[data-section="0"] .live2d-eye::after {
+  bottom: -72%;
+  border-top: 0.16rem solid rgba(35, 25, 32, 0.22);
+  border-radius: 999px 999px 0 0;
+  transform: translateY(calc(var(--blink-closure) * -62%));
+}
+
+.scroll-section[data-section="0"] .live2d-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 7.5%;
+  width: min(46%, 280px);
+  height: 2.3rem;
+  transform: translateX(-50%) scaleX(calc(0.98 + var(--blink-closure) * 0.02));
+  border-radius: 999px;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
+  filter: blur(8px);
+  opacity: 0.46;
+}
+
+.scroll-section[data-section="0"] .live2d-caption {
+  position: absolute;
+  left: 2rem;
+  right: 2rem;
+  bottom: 1.25rem;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 245, 166, 0.68);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+}
+
+.scroll-section[data-section="0"] .live2d-caption-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(245, 230, 66, 0.68), rgba(245, 230, 66, 0));
+}
+
+.scroll-section[data-section="0"] .live2d-caption-text {
+  white-space: nowrap;
+}
+
 @media (max-width: 900px) {
   .scroll-section[data-section="0"] .hero-inner {
     width: min(1100px, 92vw);
@@ -374,6 +627,21 @@
   .scroll-section[data-section="0"] .hero-visual,
   .scroll-section[data-section="0"] .hero-visual-frame {
     min-height: 420px;
+  }
+
+  .scroll-section[data-section="0"] .live2d-caption {
+    left: 1.25rem;
+    right: 1.25rem;
+    bottom: 1rem;
+    font-size: 0.58rem;
+  }
+
+  .scroll-section[data-section="0"] .live2d-eye::before {
+    border-bottom-width: 0.28rem;
+  }
+
+  .scroll-section[data-section="0"] .live2d-eye::after {
+    border-top-width: 0.12rem;
   }
 }
 
@@ -776,113 +1044,95 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   inset: 0;
   pointer-events: none;
   z-index: 5;
-  animation: crtFlicker 0.12s infinite;
+  animation: crtFlicker 0.15s infinite;
 }
 
-/* CRT scanlines - more prominent */
+/* CRT scanlines */
 .crt-overlay::before {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 1px,
-      rgba(0, 0, 0, 0.25) 1px,
-      rgba(0, 0, 0, 0.25) 3px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.03) 0 1px,
-      transparent 1px 2px
-    );
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.12) 2px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
   z-index: 1;
 }
 
-/* CRT edge vignette + inner glow - stronger */
+/* CRT edge vignette + inner glow */
 .crt-overlay::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
     radial-gradient(
-      ellipse 85% 75% at 50% 50%,
-      transparent 40%,
-      rgba(0, 0, 0, 0.5) 100%
+      ellipse 90% 80% at 50% 50%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.35) 100%
     ),
     radial-gradient(
       ellipse 100% 100% at 50% 50%,
-      transparent 50%,
-      rgba(0, 0, 0, 0.7) 80%,
-      rgba(0, 0, 0, 0.95) 100%
+      transparent 60%,
+      rgba(0, 0, 0, 0.5) 85%,
+      rgba(0, 0, 0, 0.8) 100%
     );
   z-index: 2;
 }
 
-/* CRT flicker animation - more noticeable */
+/* CRT flicker animation */
 @keyframes crtFlicker {
-  0% { opacity: 0.92; }
-  3% { opacity: 1; }
-  6% { opacity: 0.88; }
-  9% { opacity: 1; }
-  25% { opacity: 0.95; }
-  28% { opacity: 1; }
-  50% { opacity: 0.9; }
-  53% { opacity: 1; }
-  78% { opacity: 0.94; }
-  81% { opacity: 1; }
-  100% { opacity: 0.92; }
+  0% { opacity: 0.97; }
+  5% { opacity: 1; }
+  10% { opacity: 0.98; }
+  15% { opacity: 1; }
+  50% { opacity: 0.99; }
+  55% { opacity: 1; }
+  100% { opacity: 0.97; }
 }
 
-/* CRT phosphor glow - stronger */
+/* CRT phosphor glow - subtle screen glow */
 .crt-glow {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(
-      ellipse 70% 60% at 50% 50%,
-      rgba(245, 230, 66, 0.06) 0%,
-      rgba(0, 212, 255, 0.03) 30%,
-      transparent 60%
-    );
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 50%,
+    rgba(245, 230, 66, 0.03) 0%,
+    transparent 70%
+  );
   pointer-events: none;
   z-index: 4;
-  animation: phosphorPulse 3s ease-in-out infinite;
 }
 
-@keyframes phosphorPulse {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
-}
-
-/* CRT moire pattern - more visible */
+/* CRT moire pattern overlay */
 .crt-moire {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 6;
-  opacity: 0.08;
+  opacity: 0.04;
   background-image:
     repeating-radial-gradient(
       circle at 50% 50%,
       transparent 0,
-      transparent 3px,
-      rgba(245, 230, 66, 0.4) 3px,
-      rgba(245, 230, 66, 0.4) 4px
+      transparent 2px,
+      rgba(245, 230, 66, 0.3) 2px,
+      rgba(245, 230, 66, 0.3) 3px
     );
-  background-size: 10px 10px;
-  animation: moireShift 6s ease-in-out infinite;
+  background-size: 8px 8px;
+  animation: moireShift 8s ease-in-out infinite;
 }
 
 @keyframes moireShift {
   0%, 100% { transform: rotate(0deg) scale(1); }
-  25% { transform: rotate(1deg) scale(1.02); }
-  50% { transform: rotate(-0.5deg) scale(0.98); }
-  75% { transform: rotate(0.8deg) scale(1.01); }
+  25% { transform: rotate(0.5deg) scale(1.01); }
+  50% { transform: rotate(-0.3deg) scale(0.99); }
+  75% { transform: rotate(0.4deg) scale(1.005); }
 }
 
-/* CRT horizontal distortion lines - more frequent */
+/* CRT horizontal distortion lines */
 .crt-distortion {
   position: absolute;
   inset: 0;
@@ -897,100 +1147,33 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   position: absolute;
   left: 0;
   width: 100%;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(245, 230, 66, 0.3) 15%,
-    rgba(255, 255, 255, 0.5) 50%,
-    rgba(245, 230, 66, 0.3) 85%,
+    rgba(245, 230, 66, 0.15) 20%,
+    rgba(245, 230, 66, 0.25) 50%,
+    rgba(245, 230, 66, 0.15) 80%,
     transparent 100%
   );
   opacity: 0;
-  animation: distortionLine 4s ease-in-out infinite;
+  animation: distortionLine 6s ease-in-out infinite;
 }
 
 .crt-distortion::before {
-  top: 25%;
+  top: 30%;
   animation-delay: 0s;
 }
 
 .crt-distortion::after {
-  top: 65%;
-  animation-delay: 2s;
+  top: 70%;
+  animation-delay: 3s;
 }
 
 @keyframes distortionLine {
-  0%, 88%, 100% { opacity: 0; transform: translateX(-100%); }
-  4% { opacity: 1; transform: translateX(0); }
-  12% { opacity: 0; transform: translateX(100%); }
-}
-
-/* CRT RGB pixel grid effect */
-.crt-rgb-grid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 3;
-  opacity: 0.12;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 0, 0, 0.1) 0px,
-      rgba(0, 255, 0, 0.1) 1px,
-      rgba(0, 0, 255, 0.1) 2px,
-      transparent 3px
-    );
-  background-size: 3px 100%;
-  mix-blend-mode: overlay;
-}
-
-/* CRT static noise */
-.crt-noise {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 8;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  animation: noiseShift 0.1s steps(2) infinite;
-}
-
-@keyframes noiseShift {
-  0% { transform: translate(0, 0); }
-  50% { transform: translate(2px, -1px); }
-  100% { transform: translate(-1px, 1px); }
-}
-
-/* CRT horizontal roll effect */
-.crt-roll {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9;
-  overflow: hidden;
-}
-
-.crt-roll::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02) 0%,
-    transparent 5%,
-    transparent 95%,
-    rgba(0, 0, 0, 0.15) 100%
-  );
-  animation: rollBar 8s linear infinite;
-}
-
-@keyframes rollBar {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
+  0%, 90%, 100% { opacity: 0; transform: translateX(-100%); }
+  5% { opacity: 0.8; transform: translateX(0); }
+  15% { opacity: 0; transform: translateX(100%); }
 }
 
 .hero-inner {
@@ -3025,7 +3208,7 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   transform: translate(calc(-50% + 8px), calc(-52% - 2px));
 }
 
-/* Mobile fit pass: keep the restored static hero usable on narrow screens. */
+/* Mobile fit pass for the Live2D copy. */
 @media (max-width: 760px) {
   html,
   body {
@@ -3153,18 +3336,37 @@ a { color: inherit; text-decoration: none; text-transform: none; }
     bottom: 10px;
   }
 
-  .scroll-section[data-section="0"] .hero-visual-image,
-  .scroll-section[data-section="0"] .hero-visual-glitch {
+  .scroll-section[data-section="0"] .live2d-shell,
+  .scroll-section[data-section="0"] .live2d-rig {
     width: min(112%, 410px);
+  }
+
+  .scroll-section[data-section="0"] .live2d-shell {
     transform: translate(-50%, -48%);
   }
 
-  .scroll-section[data-section="0"] .hero-visual-glitch--cyan {
+  .scroll-section[data-section="0"] .live2d-rig {
+    transform:
+      translate(-50%, -48%)
+      translate3d(0, calc(var(--breath-y) + var(--float-y)), 0)
+      rotate(var(--body-r))
+      scale(var(--body-sx), var(--body-sy));
+  }
+
+  .scroll-section[data-section="0"] .live2d-shell--cyan {
     transform: translate(calc(-50% - 4px), calc(-48% + 1px));
   }
 
-  .scroll-section[data-section="0"] .hero-visual-glitch--magenta {
+  .scroll-section[data-section="0"] .live2d-shell--magenta {
     transform: translate(calc(-50% + 4px), calc(-48% - 1px));
+  }
+
+  .scroll-section[data-section="0"] .live2d-caption {
+    left: 14px;
+    right: 14px;
+    bottom: 10px;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
   }
 
   .hero-scroll,
