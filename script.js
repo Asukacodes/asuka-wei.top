@@ -1,4 +1,4 @@
-document.documentElement.classList.add("performance-mode");
+document.documentElement.classList.remove("performance-mode");
 
 /* ==============================================
    ASCII MATRIX — Perlin Noise, Both Sides
@@ -423,8 +423,14 @@ document.documentElement.classList.add("performance-mode");
   var transitionToken = 0;
   var wheelAccum = 0;
   var WHEEL_THRESHOLD = 70;
+  var touchStartY = 0;
+  var touchStartX = 0;
+  var touchStartSection = null;
+  var touchStartedAtEdge = false;
+  var TOUCH_THRESHOLD = 54;
   var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var hasGsap = Boolean(window.gsap);
+  var isTouchViewport = window.matchMedia && window.matchMedia("(max-width: 760px)").matches;
 
   if (hasGsap) {
     document.documentElement.classList.add("gsap-ready");
@@ -486,6 +492,7 @@ document.documentElement.classList.add("performance-mode");
           });
         }
       });
+      runGsapSectionAccents(section, 1);
       return;
     }
 
@@ -496,6 +503,68 @@ document.documentElement.classList.add("performance-mode");
         item.classList.add("revealed");
       }, 40);
     });
+  }
+
+  function runGsapSectionAccents(section, direction) {
+    if (!hasGsap || prefersReducedMotion || !section) return;
+
+    var heroChars = section.querySelectorAll(".hero-title .hero-char");
+    if (heroChars.length) {
+      gsap.killTweensOf(heroChars);
+      gsap.set(heroChars, {
+        autoAlpha: 0,
+        y: 18,
+        rotationX: -28,
+        transformOrigin: "50% 70%"
+      });
+      gsap.to(heroChars, {
+        autoAlpha: 1,
+        y: 0,
+        rotationX: 0,
+        duration: 0.58,
+        ease: "back.out(1.35)",
+        stagger: { each: 0.018, from: "start" },
+        overwrite: "auto",
+        clearProps: "visibility"
+      });
+    }
+
+    var heroFrame = section.querySelector(".hero-visual-frame");
+    if (heroFrame) {
+      gsap.killTweensOf(heroFrame);
+      gsap.fromTo(heroFrame, {
+        autoAlpha: 0.9,
+        y: 14,
+        rotation: -1.2,
+        scale: 0.985
+      }, {
+        autoAlpha: 1,
+        y: 0,
+        rotation: 0,
+        scale: 1,
+        duration: 0.64,
+        ease: "power3.out",
+        overwrite: "auto",
+        clearProps: "visibility"
+      });
+    }
+
+    var accentItems = section.querySelectorAll(".hero-panel, .about-card");
+    if (accentItems.length) {
+      gsap.killTweensOf(accentItems);
+      gsap.fromTo(accentItems, {
+        y: direction >= 0 ? 14 : -10,
+        scale: 0.985
+      }, {
+        y: 0,
+        scale: 1,
+        duration: 0.42,
+        ease: "power3.out",
+        stagger: 0.035,
+        overwrite: "auto",
+        clearProps: "transform"
+      });
+    }
   }
 
   function updateUI() {
@@ -621,6 +690,11 @@ document.documentElement.classList.add("performance-mode");
             });
           }
         }, prefersReducedMotion ? 0 : 0.18);
+      gsap.delayedCall(prefersReducedMotion ? 0 : 0.2, function () {
+        if (activeToken === transitionToken) {
+          runGsapSectionAccents(next, direction);
+        }
+      });
       guardTimer = setTimeout(finishTransition, prefersReducedMotion ? 80 : 820);
       return;
     }
@@ -638,6 +712,14 @@ document.documentElement.classList.add("performance-mode");
         pendingSection = null;
       }
     }, 700);
+  }
+
+  function canScrollWithin(section, direction) {
+    if (!section) return false;
+    var maxScroll = section.scrollHeight - section.clientHeight;
+    if (maxScroll <= 2) return false;
+    if (direction > 0) return section.scrollTop < maxScroll - 2;
+    return section.scrollTop > 2;
   }
 
   sections.forEach(function (section, idx) {
@@ -659,6 +741,33 @@ document.documentElement.classList.add("performance-mode");
       wheelAccum = 0;
     }
   }, { passive: false });
+
+  document.addEventListener("touchstart", function (e) {
+    if (!e.touches || e.touches.length !== 1) return;
+    var touch = e.touches[0];
+    touchStartY = touch.clientY;
+    touchStartX = touch.clientX;
+    touchStartSection = sections[currentSection];
+    touchStartedAtEdge = touchStartSection ? !canScrollWithin(touchStartSection, 1) && !canScrollWithin(touchStartSection, -1) : false;
+  }, { passive: true });
+
+  document.addEventListener("touchend", function (e) {
+    if (!touchStartSection || !e.changedTouches || e.changedTouches.length !== 1) return;
+    var touch = e.changedTouches[0];
+    var deltaY = touchStartY - touch.clientY;
+    var deltaX = touchStartX - touch.clientX;
+    if (Math.abs(deltaY) < TOUCH_THRESHOLD || Math.abs(deltaY) < Math.abs(deltaX) * 1.15) {
+      touchStartSection = null;
+      return;
+    }
+    var direction = deltaY > 0 ? 1 : -1;
+    if (!isTouchViewport && !touchStartedAtEdge && canScrollWithin(touchStartSection, direction)) {
+      touchStartSection = null;
+      return;
+    }
+    goToSection(currentSection + direction);
+    touchStartSection = null;
+  }, { passive: true });
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
@@ -779,7 +888,6 @@ document.documentElement.classList.add("performance-mode");
    Screen shake + flash + title distortion
    =========================== */
 (function initHeroGlitchBurst() {
-  return;
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   var heroTitle = document.querySelector(".hero-title");
   var titleLines = Array.from(document.querySelectorAll(".hero-title .title-line"));
@@ -791,7 +899,7 @@ document.documentElement.classList.add("performance-mode");
     var particleContainer = document.createElement("div");
     particleContainer.className = "title-glitch-particles";
     particleContainer.id = "titleParticles";
-    particleInner = heroInner.insertBefore(particleContainer, heroInner.firstChild);
+    heroInner.insertBefore(particleContainer, heroInner.firstChild);
   }
 
   var glitchChars = "01XYxX@#$%&*?!^+-<>/\\|~`";
@@ -903,7 +1011,6 @@ document.documentElement.classList.add("performance-mode");
    HERO TITLE RANDOM SLICES — ENHANCED
    =========================== */
 (function initHeroSliceRandom() {
-  return;
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   var lines = Array.from(document.querySelectorAll(".hero-title .title-line"));
   if (!lines.length) return;
@@ -974,7 +1081,6 @@ document.documentElement.classList.add("performance-mode");
    HERO TITLE LETTER MOTION — ENHANCED
    =========================== */
 (function initHeroCharMotion() {
-  return;
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   var heroChars = Array.from(document.querySelectorAll(".hero-title .hero-char"));
   if (!heroChars.length) return;
@@ -1019,7 +1125,6 @@ document.documentElement.classList.add("performance-mode");
    HERO CYBERPUNK 2077 GLITCH
    =========================== */
 (function initHeroCyberpunkGlitch() {
-  return;
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   var hero = document.querySelector(".scroll-section[data-section='0']");
@@ -1065,7 +1170,6 @@ document.documentElement.classList.add("performance-mode");
    RANDOM TEXT GLITCH WAVE
    =========================== */
 (function initTextGlitchWave() {
-  return;
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   var selectors = [

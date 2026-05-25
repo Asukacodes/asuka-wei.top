@@ -138,12 +138,11 @@
   color: currentColor;
   -webkit-text-fill-color: currentColor;
   text-shadow: inherit;
-  animation: none;
-  transform: none !important;
   font-family: inherit !important;
   font-weight: inherit !important;
   font-size: inherit !important;
   letter-spacing: inherit;
+  transform: translateZ(0);
 }
 
 .scroll-section[data-section="0"] .hero-desc {
@@ -3278,34 +3277,7 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   }
 }
 
-/* Performance pass: keep the cyberpunk look without continuous paint-heavy effects. */
-.hero-visual-glitch,
-.scroll-section[data-section="0"] .hero-visual-glitch,
-.cyberpunk2077-fx {
-  display: none !important;
-}
-
-.hero-tag,
-.hero-title::after,
-.title-line,
-.title-line .hero-char,
-.title-line .hero-char--lead-a,
-.title-line .hero-char--lead-w,
-.title-line::before,
-.title-line::after,
-.title-line.is-slice-hit::before,
-.bio-hex,
-.scroll-line,
-.contact-line,
-.logo-bracket,
-.logo-dot,
-.logo-cursor,
-.pill-dot,
-.footer-dot,
-.cmd-cursor {
-  animation: none !important;
-}
-
+/* Balanced FX pass: restore cyberpunk motion while keeping heavy effects scoped. */
 .site-header,
 .about-card,
 .about-bio,
@@ -3326,28 +3298,24 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   will-change: auto;
 }
 
-.performance-mode *,
-.performance-mode *::before,
-.performance-mode *::after {
-  animation-iteration-count: 1 !important;
+.gsap-ready .scroll-section.active,
+.gsap-ready .scroll-section.active .reveal-item,
+.gsap-ready .scroll-section.active .hero-char,
+.gsap-ready .scroll-section.active .hero-visual-frame,
+.gsap-ready .scroll-section.active .hero-panel,
+.gsap-ready .scroll-section.active .about-card,
+.gsap-ready .scroll-section.active .project-card,
+.gsap-ready .btn:hover {
+  will-change: transform, opacity;
 }
 
-.performance-mode .hero-tag,
-.performance-mode .hero-title::after,
-.performance-mode .title-line,
-.performance-mode .title-line::before,
-.performance-mode .title-line::after,
-.performance-mode .title-line .hero-char,
-.performance-mode .bio-hex,
-.performance-mode .scroll-line,
-.performance-mode .contact-line,
-.performance-mode .logo-bracket,
-.performance-mode .logo-dot,
-.performance-mode .logo-cursor,
-.performance-mode .pill-dot,
-.performance-mode .footer-dot,
-.performance-mode .cmd-cursor,
-.performance-mode .cyberpunk2077-fx *,
-.performance-mode .hero-visual-glitch {
-  animation: none !important;
+@media (max-width: 760px) {
+  .cyberpunk2077-fx__noise {
+    display: none;
+  }
+
+  .cyberpunk2077-fx__scan--red,
+  .cyberpunk2077-fx__scan--cyan {
+    animation-duration: 5.8s;
+  }
 }
