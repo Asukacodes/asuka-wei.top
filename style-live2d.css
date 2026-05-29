@@ -3085,7 +3085,7 @@ a { color: inherit; text-decoration: none; text-transform: none; }
     font-size: 0.56rem;
     letter-spacing: 0.08em;
   }
-  .corner { display: none; }
+/* .corner { display: none; }
   .section-dots { display: none; }
   .section-counter { display: none; }
   .matrix-right { display: block; }
@@ -3104,6 +3104,179 @@ a { color: inherit; text-decoration: none; text-transform: none; }
   .scanlines {
     opacity: 0.5;
   }
+}
+
+/* ===========================
+   ENHANCED SCANLINES (Live2D)
+   =========================== */
+.enhanced-scanlines {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 9997;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scan-bar {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.15), rgba(255, 43, 94, 0.1), transparent);
+  animation: scanBarMove 4s linear infinite;
+}
+
+.scan-bar--1 { top: 0; animation-duration: 3.5s; }
+.scan-bar--2 { top: 40%; animation-duration: 5s; animation-delay: -1.5s; }
+
+@keyframes scanBarMove {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* ===========================
+   GRID OVERLAY (Live2D)
+   =========================== */
+.grid-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image:
+    linear-gradient(var(--primary) 1px, transparent 1px),
+    linear-gradient(90deg, var(--primary) 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-position: center center;
+}
+
+/* ===========================
+   PERFORMANCE STATE (Live2D)
+   =========================== */
+.performance-paused,
+.performance-paused * {
+  animation-play-state: paused !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* ===========================
+   KEYBOARD HINTS (Live2D)
+   =========================== */
+.keyboard-hints {
+  background: rgba(10, 8, 0, 0.8);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.keyboard-hints .hint {
+  display: inline-block;
+  background: var(--primary-dim);
+  color: var(--primary);
+  padding: 2px 6px;
+  margin: 0 4px;
+  border-radius: 2px;
+  border: 1px solid var(--border-bright);
+}
+
+/* ===========================
+   CLICK PARTICLES (Live2D)
+   =========================== */
+.click-particle {
+  text-shadow:
+    0 0 6px rgba(245, 230, 66, 0.8),
+    0 0 12px rgba(245, 230, 66, 0.5),
+    -1px 0 rgba(255, 43, 94, 0.6),
+    1px 0 rgba(0, 212, 255, 0.6);
+}
+
+/* ===========================
+   LIVE2D STAGE INTERACTIVE (Live2D)
+   =========================== */
+.live2d-stage {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.live2d-body-bounce {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.live2d-head-sway {
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+
+/* Status pill breathing */
+.status-pill {
+  animation: statusBreath 2s ease-in-out infinite;
+}
+
+@keyframes statusBreath {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4);
+    border-color: rgba(245, 230, 66, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(0, 212, 255, 0);
+    border-color: rgba(245, 230, 66, 0.8);
+  }
+}
+
+/* Card hover effects */
+.project-card {
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(245, 230, 66, 0.2);
+}
+
+/* Logo hover enhancement */
+.logo {
+  transition: text-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.logo:hover {
+  transform: skewX(-8deg) translateX(2px);
+}
+
+/* CRT Flicker for Live2D */
+.crt-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.crt-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+}
+
+.crt-moire {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  animation: crtMoire 0.1s steps(2) infinite;
+}
+
+@keyframes crtMoire {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.97; }
 }
 
 /* Final homepage-only layer. Keep this at the end so non-hero pages stay untouched. */

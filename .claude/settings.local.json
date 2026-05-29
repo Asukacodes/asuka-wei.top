@@ -18,7 +18,12 @@
       "Bash(node:*)",
       "Skill(gsd-update)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(codex login *)"
+      "Bash(codex login *)",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__take_screenshot",
+      "mcp__MiniMax__understand_image",
+      "mcp__chrome-devtools__list_console_messages",
+      "mcp__chrome-devtools__evaluate_script"
     ]
   }
 }

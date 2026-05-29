@@ -1084,3 +1084,308 @@
     card.addEventListener("mouseleave", function () { this.style.transform = ""; });
   });
 })();
+
+
+/* ===========================
+   GSAP SCROLLTRIGGER & ENHANCEMENTS
+   Unified with index.html
+   =========================== */
+(function initLive2dEnhancements() {
+  if (!window.gsap) return;
+
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Register ScrollTrigger
+  if (window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
+  // Hero parallax
+  var heroFrame = document.querySelector(".hero-visual-frame");
+  var heroTitle = document.querySelector(".hero-title");
+  if (heroFrame && !prefersReducedMotion) {
+    gsap.to(heroFrame, {
+      y: -50,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".hero-section",
+        start: "top top",
+        end: "bottom top",
+        scrub: 1.2
+      }
+    });
+  }
+
+  // Cards reveal
+  document.querySelectorAll(".project-card").forEach(function(card) {
+    gsap.from(card, {
+      y: 70,
+      opacity: 0,
+      duration: 0.9,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: card,
+        start: "top 88%",
+        toggleActions: "play none none reverse"
+      }
+    });
+  });
+
+  // Logo glow
+  var logo = document.querySelector(".logo");
+  if (logo && !prefersReducedMotion) {
+    gsap.to(logo, {
+      textShadow: "0 0 12px rgba(0, 212, 255, 0.8), 0 0 24px rgba(0, 212, 255, 0.5)",
+      duration: 1.2,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1
+    });
+  }
+
+  // Nav link effects
+  document.querySelectorAll(".nav-link").forEach(function(link) {
+    link.addEventListener("mouseenter", function() {
+      gsap.to(link, {
+        textShadow: "0 0 8px rgba(0, 212, 255, 0.9)",
+        x: 3,
+        duration: 0.25,
+        ease: "power2.out"
+      });
+    });
+    link.addEventListener("mouseleave", function() {
+      gsap.to(link, {
+        textShadow: "none",
+        x: 0,
+        duration: 0.4
+      });
+    });
+  });
+
+  // Card icon rotation
+  document.querySelectorAll(".project-card").forEach(function(card) {
+    var icon = card.querySelector(".card-icon");
+    if (icon) {
+      card.addEventListener("mouseenter", function() {
+        gsap.to(icon, {
+          rotation: 360,
+          scale: 1.2,
+          duration: 0.6,
+          ease: "back.out(2)"
+        });
+      });
+      card.addEventListener("mouseleave", function() {
+        gsap.to(icon, {
+          rotation: 0,
+          scale: 1,
+          duration: 0.35
+        });
+      });
+    }
+  });
+
+  // Performance optimization
+  document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+      gsap.globalTimeline.pause();
+    } else {
+      gsap.globalTimeline.resume();
+    }
+  });
+
+  // Enhanced scanlines
+  var overlay = document.createElement("div");
+  overlay.className = "enhanced-scanlines";
+  overlay.innerHTML = '<div class="scan-bar scan-bar--1"></div><div class="scan-bar scan-bar--2"></div>';
+  document.body.appendChild(overlay);
+
+  // Grid overlay
+  var grid = document.createElement("div");
+  grid.className = "grid-overlay";
+  document.body.insertBefore(grid, document.body.firstChild);
+
+  console.log("Live2D enhancements loaded");
+})();
+
+
+/* ===========================
+   INTERACTIVE TYPING EFFECT
+   Typewriter animation for terminal elements
+   =========================== */
+(function initTypingEffect() {
+  if (!window.gsap) return;
+
+  function typeText(element, text, speed) {
+    var i = 0;
+    element.textContent = "";
+    function type() {
+      if (i < text.length) {
+        element.textContent += text.charAt(i);
+        i++;
+        setTimeout(type, speed || 50);
+      }
+    }
+    type();
+  }
+
+  // Terminal-style typing on contact section
+  var contactSection = document.querySelector(".contact-section");
+  if (contactSection) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var cmdText = entry.target.querySelector(".cmd-text");
+          if (cmdText && !cmdText.dataset.typed) {
+            cmdText.dataset.typed = "true";
+            typeText(cmdText, "Open for tech & creative collaboration", 40);
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+    observer.observe(contactSection);
+  }
+})();
+
+
+/* ===========================
+   INTERACTIVE PARTICLE SYSTEM
+   Click to spawn particles
+   =========================== */
+(function initParticleClick() {
+  if (!window.gsap) return;
+
+  var chars = "01XYxX@#$%&*?!^+-<>/";
+  var heroSection = document.querySelector(".hero-section");
+
+  if (!heroSection) return;
+
+  heroSection.addEventListener("click", function(e) {
+    var count = 8 + Math.floor(Math.random() * 8);
+    for (var i = 0; i < count; i++) {
+      spawnParticle(e.clientX, e.clientY);
+    }
+  });
+
+  function spawnParticle(x, y) {
+    var particle = document.createElement("span");
+    particle.className = "click-particle";
+    particle.textContent = chars[Math.floor(Math.random() * chars.length)];
+    particle.style.cssText = "position:fixed;left:" + x + "px;top:" + y + "px;font-family:var(--font-mono);font-size:1rem;color:var(--primary);pointer-events:none;z-index:9999;";
+    document.body.appendChild(particle);
+
+    gsap.to(particle, {
+      x: (Math.random() - 0.5) * 200,
+      y: (Math.random() - 0.5) * 200 - 100,
+      opacity: 0,
+      rotation: Math.random() * 360,
+      scale: Math.random() * 0.5 + 0.5,
+      duration: 0.8 + Math.random() * 0.5,
+      ease: "power2.out",
+      onComplete: function() {
+        particle.remove();
+      }
+    });
+  }
+})();
+
+
+/* ===========================
+   KEYBOARD SHORTCUT INTERACTIVE
+   =========================== */
+(function initKeyboardShortcuts() {
+  var hints = document.createElement("div");
+  hints.className = "keyboard-hints";
+  hints.innerHTML = '<span class="hint">[G]</span> GSAP ON <span class="hint">[M]</span> MATRIX OFF <span class="hint">[R]</span> RESET';
+  hints.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;color:var(--text-muted);z-index:500;opacity:0.6;";
+  document.body.appendChild(hints);
+
+  document.addEventListener("keydown", function(e) {
+    var key = e.key.toLowerCase();
+
+    if (key === "g") {
+      gsap.globalTimeline.paused() ? gsap.globalTimeline.resume() : gsap.globalTimeline.pause();
+      flashMessage(gsap.globalTimeline.paused() ? "GSAP PAUSED" : "GSAP RESUMED");
+    }
+
+    if (key === "m") {
+      var matrix = document.querySelector(".matrix-wrapper");
+      if (matrix) {
+        matrix.style.display = matrix.style.display === "none" ? "" : "none";
+        flashMessage(matrix.style.display === "none" ? "MATRIX OFF" : "MATRIX ON");
+      }
+    }
+
+    if (key === "r") {
+      window.location.reload();
+    }
+  });
+
+  function flashMessage(text) {
+    var msg = document.createElement("div");
+    msg.textContent = text;
+    msg.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-mono);font-size:2rem;color:var(--blue);text-shadow:0 0 20px var(--blue);z-index:9999;pointer-events:none;";
+    document.body.appendChild(msg);
+    gsap.fromTo(msg, { opacity: 0, scale: 0.8 }, {
+      opacity: 1,
+      scale: 1,
+      duration: 0.2,
+      ease: "back.out(2)",
+      onComplete: function() {
+        gsap.to(msg, {
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.3,
+          delay: 0.5,
+          onComplete: function() { msg.remove(); }
+        });
+      }
+    });
+  }
+})();
+
+
+/* ===========================
+   LIVE2D MOUSE TRACKING
+   Character follows cursor
+   =========================== */
+(function initLive2dMouse() {
+  if (!window.gsap) return;
+
+  var live2dStage = document.querySelector(".live2d-stage");
+  var live2dBody = document.querySelector(".live2d-body-bounce");
+  var live2dHead = document.querySelector(".live2d-head-sway");
+
+  if (!live2dStage || !live2dBody) return;
+
+  var rect = live2dStage.getBoundingClientRect();
+  var centerX = rect.left + rect.width / 2;
+  var centerY = rect.top + rect.height / 2;
+
+  document.addEventListener("mousemove", function(e) {
+    var x = (e.clientX - centerX) / rect.width * 40;
+    var y = (e.clientY - centerY) / rect.height * 20;
+
+    gsap.to(live2dBody, {
+      rotationY: x * 0.3,
+      rotationX: y * 0.2,
+      duration: 0.5,
+      ease: "power2.out"
+    });
+
+    if (live2dHead) {
+      gsap.to(live2dHead, {
+        rotationX: y * 0.15,
+        duration: 0.4
+      });
+    }
+  });
+
+  document.addEventListener("mouseleave", function() {
+    gsap.to([live2dBody, live2dHead], {
+      rotationY: 0,
+      rotationX: 0,
+      duration: 0.8,
+      ease: "elastic.out(1, 0.5)"
+    });
+  });
+})();

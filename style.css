@@ -3319,3 +3319,582 @@ a { color: inherit; text-decoration: none; text-transform: none; }
     animation-duration: 5.8s;
   }
 }
+
+/* ===========================
+   ENHANCED SCANLINES & CRT OVERLAY
+   =========================== */
+.enhanced-scanlines {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 9997;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scan-bar {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.15), rgba(255, 43, 94, 0.1), transparent);
+  animation: scanBarMove 4s linear infinite;
+}
+
+.scan-bar--1 {
+  top: 0;
+  animation-duration: 3.5s;
+}
+
+.scan-bar--2 {
+  top: 40%;
+  animation-duration: 5s;
+  animation-delay: -1.5s;
+}
+
+@keyframes scanBarMove {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* CRT Flicker overlay */
+.crt-flicker {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9996;
+  background: transparent;
+  mix-blend-mode: overlay;
+}
+
+/* ===========================
+   PERFORMANCE PAUSED STATE
+   =========================== */
+.performance-paused,
+.performance-paused * {
+  animation-play-state: paused !important;
+  transition-duration: 0.001ms !important;
+}
+
+.is-scrolling .hero-title::after,
+.is-scrolling .crt-flicker {
+  animation-play-state: paused;
+}
+
+/* ===========================
+   SECTION TRANSITION FLASH
+   =========================== */
+.section-transition-flash {
+  background: radial-gradient(circle at center, rgba(0, 212, 255, 0.08) 0%, transparent 60%);
+}
+
+/* ===========================
+   CYBERPUNK CARD HOVER EFFECTS
+   =========================== */
+.project-card {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+/* ===========================
+   ENHANCED NEON TEXT GLOW
+   =========================== */
+.logo {
+  transition: text-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.logo:hover {
+  transform: skewX(-8deg) translateX(2px);
+}
+
+/* Status indicator pulse enhancement */
+.status-pill {
+  animation: statusBreath 2s ease-in-out infinite;
+}
+
+@keyframes statusBreath {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4);
+    border-color: rgba(245, 230, 66, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(0, 212, 255, 0);
+    border-color: rgba(245, 230, 66, 0.8);
+  }
+}
+
+/* ===========================
+   ABOUT CARD SPECIAL EFFECTS
+   =========================== */
+.about-card {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.about-card:hover {
+  transform: translateY(-6px) rotateX(2deg);
+}
+
+/* ===========================
+   LOADING TRANSITION
+   =========================== */
+.scroll-section {
+  transition: filter 0.3s ease;
+}
+
+.scroll-section.active {
+  filter: none;
+}
+
+/* First load animation */
+.hero-section.active .hero-title {
+  animation: heroLoadGlitch 0.8s ease-out forwards;
+}
+
+@keyframes heroLoadGlitch {
+  0% {
+    filter: blur(4px) brightness(2);
+    transform: skewX(-15deg);
+  }
+  15% {
+    filter: blur(0) brightness(1.5);
+    transform: skewX(-5deg);
+  }
+  30% {
+    filter: blur(2px) brightness(1.2);
+    transform: skewX(-12deg);
+  }
+  50% {
+    filter: blur(0) brightness(1);
+    transform: skewX(-8deg);
+  }
+  100% {
+    filter: blur(0) brightness(1);
+    transform: skewX(-10deg);
+  }
+}
+
+/* ===========================
+   MATRIX DIGITAL RAIN TRAILS
+   =========================== */
+.matrix-trails {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.trail {
+  position: absolute;
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--primary), transparent);
+  opacity: 0.3;
+  animation: trailDrop 3s linear infinite;
+}
+
+.trail--1 {
+  left: 25%;
+  animation-duration: 2.5s;
+  background: linear-gradient(to bottom, transparent, var(--blue), transparent);
+}
+
+.trail--2 {
+  left: 75%;
+  animation-duration: 3.2s;
+  animation-delay: -1s;
+}
+
+@keyframes trailDrop {
+  0% {
+    top: -50px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    top: 100vh;
+    opacity: 0;
+  }
+}
+
+/* ===========================
+   GRID OVERLAY PULSE
+   =========================== */
+.grid-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image:
+    linear-gradient(var(--primary) 1px, transparent 1px),
+    linear-gradient(90deg, var(--primary) 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-position: center center;
+}
+
+/* ===========================
+   HOLOGRAPHIC BUTTON EFFECT
+   =========================== */
+.btn {
+  background-image: linear-gradient(
+    90deg,
+    var(--primary) 0%,
+    var(--blue) 25%,
+    var(--accent) 50%,
+    var(--blue) 75%,
+    var(--primary) 100%
+  );
+  background-size: 200% 100%;
+  background-position: 0% center;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  background-blend-mode: soft-light;
+}
+
+.btn-outline {
+  background-color: transparent;
+}
+
+/* ===========================
+   CARD DEPTH PARALLAX
+   =========================== */
+.project-card,
+.about-card {
+  will-change: transform;
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s ease;
+}
+
+.project-card:hover,
+.about-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(245, 230, 66, 0.2);
+}
+
+/* ===========================
+   SCROLL VELOCITY INDICATOR
+   =========================== */
+.scroll-indicator {
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 100px;
+  background: rgba(245, 230, 66, 0.2);
+  z-index: 199;
+}
+
+.scroll-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: linear-gradient(to bottom, var(--primary), transparent);
+  animation: scrollIndicatorPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollIndicatorPulse {
+  0%, 100% { top: 0; }
+  50% { top: 60%; }
+}
+
+/* ===========================
+   NAV TIME DISPLAY
+   =========================== */
+.nav-time {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--blue);
+  margin-left: 12px;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+}
+
+/* ===========================
+   SKILL BARS
+   =========================== */
+.skill-bar-container {
+  margin-top: 1rem;
+}
+
+.skill-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  letter-spacing: 0.08em;
+}
+
+.skill-value {
+  color: var(--blue);
+}
+
+.skill-bar-track {
+  height: 4px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--blue), var(--primary));
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+  border-radius: 2px;
+}
+
+/* ===========================
+   TERMINAL WIDGET
+   =========================== */
+.terminal-widget {
+  margin-top: 2rem;
+  background: rgba(5, 5, 5, 0.9);
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(245, 230, 66, 0.1);
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--primary);
+  letter-spacing: 0.1em;
+}
+
+.terminal-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-buttons span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.terminal-body {
+  padding: 12px;
+  min-height: 120px;
+}
+
+.terminal-output {
+  max-height: 100px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.terminal-line {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.terminal-echo {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--blue);
+}
+
+.terminal-result {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.terminal-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-prompt {
+  color: var(--primary);
+  font-family: var(--font-mono);
+}
+
+.terminal-input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  outline: none;
+}
+
+.terminal-input input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ===========================
+   DATA CARD EXPANSION
+   =========================== */
+.card-stats {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(245, 230, 66, 0.5);
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+/* ===========================
+   SOUND WAVE INDICATOR
+   =========================== */
+.sound-wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 1rem;
+}
+
+.wave-bar {
+  width: 3px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 2px;
+  transform-origin: bottom;
+}
+
+/* ===========================
+   EXPANDED CARD
+   =========================== */
+.project-card.is-expanded {
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+/* ===========================
+   GLOBAL TOOLTIP
+   =========================== */
+.global-tooltip {
+  max-width: 200px;
+}
+
+/* ===========================
+   SCROLL SECTION VISITED STATE
+   =========================== */
+.scroll-section.visited .section-tag {
+  color: var(--primary);
+}
+
+/* ===========================
+   INTERACTIVE NAV LINKS
+   =========================== */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  width: 0;
+  height: 1px;
+  background: var(--blue);
+  transform: translateY(-50%);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::before {
+  width: 8px;
+}
+
+/* ===========================
+   HERO TAG BLINK EFFECT
+   =========================== */
+.tag-text {
+  animation: tagBlink 3s ease-in-out infinite;
+}
+
+@keyframes tagBlink {
+  0%, 90%, 100% { opacity: 1; }
+  92% { opacity: 0.5; }
+  94% { opacity: 1; }
+  96% { opacity: 0.3; }
+  98% { opacity: 1; }
+}
+
+/* ===========================
+   KEYBOARD HINTS (index.html)
+   =========================== */
+.keyboard-hints {
+  background: rgba(10, 8, 0, 0.8);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.keyboard-hints .hint {
+  display: inline-block;
+  background: var(--primary-dim);
+  color: var(--primary);
+  padding: 2px 6px;
+  margin: 0 4px;
+  border-radius: 2px;
+  border: 1px solid var(--border-bright);
+}
+
+/* ===========================
+   CLICK PARTICLES (index.html)
+   =========================== */
+.click-particle {
+  text-shadow:
+    0 0 6px rgba(245, 230, 66, 0.8),
+    0 0 12px rgba(245, 230, 66, 0.5),
+    -1px 0 rgba(255, 43, 94, 0.6),
+    1px 0 rgba(0, 212, 255, 0.6);
+}

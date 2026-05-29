@@ -1373,3 +1373,750 @@ document.documentElement.classList.remove("performance-mode");
     });
   });
 })();
+
+
+/* ===========================
+   GSAP SCROLLTRIGGER ENHANCEMENTS
+   Smooth parallax and scroll-driven animations
+   =========================== */
+(function initScrollTrigger() {
+  if (!window.gsap || !window.ScrollTrigger) return;
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion) return;
+
+  // Hero parallax effect
+  var heroFrame = document.querySelector(".hero-visual-frame");
+  var heroTitle = document.querySelector(".hero-title");
+  if (heroFrame) {
+    gsap.to(heroFrame, {
+      y: -50,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".hero-section",
+        start: "top top",
+        end: "bottom top",
+        scrub: 1.2
+      }
+    });
+  }
+  if (heroTitle) {
+    gsap.to(heroTitle, {
+      y: 40,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".hero-section",
+        start: "top top",
+        end: "50% top",
+        scrub: 1.8
+      }
+    });
+  }
+
+  // Cards staggered reveal with ScrollTrigger
+  document.querySelectorAll(".project-card").forEach(function(card, i) {
+    gsap.from(card, {
+      y: 70,
+      opacity: 0,
+      duration: 0.9,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: card,
+        start: "top 88%",
+        toggleActions: "play none none reverse"
+      }
+    });
+  });
+
+  // About cards reveal
+  document.querySelectorAll(".about-card").forEach(function(card, i) {
+    gsap.from(card, {
+      y: 60,
+      opacity: 0,
+      scale: 0.92,
+      duration: 0.7,
+      ease: "back.out(1.4)",
+      delay: i * 0.08,
+      scrollTrigger: {
+        trigger: card,
+        start: "top 88%",
+        toggleActions: "play none none reverse"
+      }
+    });
+  });
+
+  // Section titles glitch reveal
+  document.querySelectorAll(".section-title").forEach(function(title) {
+    gsap.from(title, {
+      skewX: -8,
+      duration: 0.8,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: title,
+        start: "top 85%",
+        toggleActions: "play none none reverse"
+      }
+    });
+  });
+})();
+
+
+/* ===========================
+   CYBERPUNK NEON GLOW EFFECTS
+   Pulsing neon animations on interactive elements
+   =========================== */
+(function initNeonEffects() {
+  if (!window.gsap) return;
+
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion) return;
+
+  // Logo continuous glow pulse
+  var logo = document.querySelector(".logo");
+  if (logo) {
+    gsap.to(logo, {
+      textShadow: "0 0 12px rgba(0, 212, 255, 0.8), 0 0 24px rgba(0, 212, 255, 0.5), 0 0 36px rgba(0, 212, 255, 0.3)",
+      duration: 1.2,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1
+    });
+  }
+
+  // Nav links glow enhancement
+  document.querySelectorAll(".nav-link").forEach(function(link) {
+    link.addEventListener("mouseenter", function() {
+      gsap.to(link, {
+        textShadow: "0 0 8px rgba(0, 212, 255, 0.9), 0 0 16px rgba(0, 212, 255, 0.6)",
+        x: 3,
+        duration: 0.25,
+        ease: "power2.out"
+      });
+    });
+    link.addEventListener("mouseleave", function() {
+      gsap.to(link, {
+        textShadow: "none",
+        x: 0,
+        duration: 0.4,
+        ease: "power2.out"
+      });
+    });
+  });
+
+  // Corner decorations pulse animation
+  document.querySelectorAll(".corner").forEach(function(corner, i) {
+    gsap.to(corner, {
+      opacity: 0.9,
+      scale: 1.15,
+      duration: 0.7 + i * 0.15,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1
+    });
+  });
+
+  // Card icon rotation on hover
+  document.querySelectorAll(".project-card").forEach(function(card) {
+    var icon = card.querySelector(".card-icon");
+    if (icon) {
+      card.addEventListener("mouseenter", function() {
+        gsap.to(icon, {
+          rotation: 360,
+          scale: 1.2,
+          duration: 0.6,
+          ease: "back.out(2)"
+        });
+      });
+      card.addEventListener("mouseleave", function() {
+        gsap.to(icon, {
+          rotation: 0,
+          scale: 1,
+          duration: 0.35
+        });
+      });
+    }
+  });
+
+  // Status pill breathing glow
+  var pillDot = document.querySelector(".pill-dot");
+  if (pillDot) {
+    gsap.to(pillDot, {
+      boxShadow: "0 0 12px rgba(0, 212, 255, 1), 0 0 24px rgba(0, 212, 255, 0.6)",
+      duration: 0.8,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1
+    });
+  }
+})();
+
+
+/* ===========================
+   ENHANCED SCANLINES & CRT EFFECTS
+   Dynamic flicker and noise for cyberpunk atmosphere
+   =========================== */
+(function initCRTEnhancements() {
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion) return;
+
+  // Create enhanced scanline overlay
+  if (!document.querySelector(".enhanced-scanlines")) {
+    var overlay = document.createElement("div");
+    overlay.className = "enhanced-scanlines";
+    overlay.innerHTML = '<div class="scan-bar scan-bar--1"></div><div class="scan-bar scan-bar--2"></div>';
+    document.body.appendChild(overlay);
+  }
+
+  // CRT flicker effect
+  var flickerInterval = setInterval(function() {
+    if (Math.random() < 0.12) {
+      var flickerOverlay = document.querySelector(".enhanced-scanlines") || document.body;
+      var intensity = 0.02 + Math.random() * 0.04;
+      flickerOverlay.style.background = "rgba(255,255,255," + intensity + ")";
+      setTimeout(function() {
+        flickerOverlay.style.background = "";
+      }, 50);
+    }
+  }, 2500);
+
+  // Store interval reference for cleanup
+  window._flickerInterval = flickerInterval;
+})();
+
+
+/* ===========================
+   PERFORMANCE OPTIMIZATION
+   Tab visibility API, reduced motion, FPS boost
+   =========================== */
+(function optimizePerformance() {
+  // Pause heavy animations when tab is not visible
+  document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+      document.body.classList.add("performance-paused");
+      if (window.gsap) {
+        gsap.globalTimeline.pause();
+      }
+    } else {
+      document.body.classList.remove("performance-paused");
+      if (window.gsap) {
+        gsap.globalTimeline.resume();
+      }
+    }
+  });
+
+  // Throttle scroll-based animations
+  var scrollTimeout;
+  var isScrolling = false;
+  window.addEventListener("scroll", function() {
+    if (!isScrolling) {
+      document.body.classList.add("is-scrolling");
+      isScrolling = true;
+    }
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(function() {
+      document.body.classList.remove("is-scrolling");
+      isScrolling = false;
+    }, 100);
+  }, { passive: true });
+
+  // Force hardware acceleration on animated elements
+  document.querySelectorAll(".hero-title, .hero-visual-frame, .title-line").forEach(function(el) {
+    el.style.transform = "translateZ(0)";
+    el.style.willChange = "transform";
+  });
+
+  // Debounced resize handler
+  var resizeTimer;
+  window.addEventListener("resize", function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      ScrollTrigger && ScrollTrigger.refresh();
+    }, 250);
+  });
+
+  console.log("Cyberpunk optimizations active");
+})();
+
+
+/* ===========================
+   LIVE SYSTEM TIME DISPLAY
+   =========================== */
+(function initSystemTime() {
+  var timeEl = document.getElementById("navTime");
+  if (!timeEl) return;
+
+  function updateTime() {
+    var now = new Date();
+    var hours = String(now.getHours()).padStart(2, "0");
+    var mins = String(now.getMinutes()).padStart(2, "0");
+    var secs = String(now.getSeconds()).padStart(2, "0");
+    timeEl.textContent = hours + ":" + mins + ":" + secs;
+  }
+
+  updateTime();
+  setInterval(updateTime, 1000);
+})();
+
+
+/* ===========================
+   INTERACTIVE SKILL BARS
+   Animated progress bars for skills
+   =========================== */
+(function initSkillBars() {
+  if (!window.gsap) return;
+
+  // Add skill bars to about cards
+  document.querySelectorAll(".about-card").forEach(function(card, i) {
+    var skills = [
+      ["TECH ANIMATION", 85],
+      ["DEVELOPMENT", 92],
+      ["CREATIVE TOOLS", 78]
+    ];
+    var skill = skills[i] || ["SKILL", 50];
+
+    var barContainer = document.createElement("div");
+    barContainer.className = "skill-bar-container";
+    barContainer.innerHTML = '<div class="skill-bar-label"><span>' + skill[0] + '</span><span class="skill-value">0%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-value="' + skill[1] + '"></div></div>';
+
+    card.appendChild(barContainer);
+  });
+
+  // Animate skill bars when scrolled into view
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var fill = entry.target.querySelector(".skill-bar-fill");
+        var valueEl = entry.target.querySelector(".skill-value");
+        if (fill && valueEl) {
+          var value = fill.dataset.value;
+          gsap.to(fill, {
+            width: value + "%",
+            duration: 1.2,
+            ease: "power2.out",
+            onUpdate: function() {
+              valueEl.textContent = Math.round(gsap.getProperty(fill, "width")) + "%";
+            }
+          });
+        }
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll(".skill-bar-container").forEach(function(el) {
+    observer.observe(el);
+  });
+})();
+
+
+/* ===========================
+   INTERACTIVE TERMINAL WIDGET
+   Typewriter terminal in contact section
+   =========================== */
+(function initTerminalWidget() {
+  var contactBlock = document.querySelector(".contact-block");
+  if (!contactBlock) return;
+
+  var terminal = document.createElement("div");
+  terminal.className = "terminal-widget";
+  terminal.innerHTML = '<div class="terminal-header"><span class="terminal-title">SYSTEM TERMINAL v2.077</span><div class="terminal-buttons"><span></span><span></span><span></span></div></div><div class="terminal-body"><div class="terminal-output"></div><div class="terminal-input"><span class="terminal-prompt">$</span><input type="text" placeholder="type a command..." /></div></div>';
+  contactBlock.appendChild(terminal);
+
+  var input = terminal.querySelector("input");
+  var output = terminal.querySelector(".terminal-output");
+  var commands = {
+    help: "> Available commands: help, about, skills, contact, clear, date, matrix",
+    about: "> Asuka Wei - Technical Animator & Creative Developer\n> Specializing in realtime pipelines and interactive tools",
+    skills: "> TECH ANIMATION ████████░░ 85%\n> DEVELOPMENT █████████░ 92%\n> CREATIVE TOOLS ███████░░░ 78%",
+    contact: "> GitHub: github.com/Asukacodes\n> Bilibili: space.bilibili.com/441116886\n> Email: available on request",
+    date: "> " + new Date().toLocaleString(),
+    matrix: "> MATRIX THEME: ACTIVE\n> Digital rain optimized for cyberpunk atmosphere"
+  };
+
+  input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      var cmd = input.value.toLowerCase().trim();
+      var response = commands[cmd] || "> Command not found. Type 'help' for available commands.";
+      output.innerHTML += '<div class="terminal-line"><span class="terminal-echo">$ ' + cmd + '</span><span class="terminal-result">' + response.replace(/\n/g, "<br>") + '</span></div>';
+      input.value = "";
+      output.scrollTop = output.scrollHeight;
+    }
+  });
+})();
+
+
+/* ===========================
+   INTERACTIVE DATA CARDS
+   Expandable cards with more info
+   =========================== */
+(function initDataCards() {
+  document.querySelectorAll(".project-card").forEach(function(card) {
+    var expanded = false;
+
+    card.addEventListener("click", function(e) {
+      if (e.target.closest("a")) return;
+      expanded = !expanded;
+      card.classList.toggle("is-expanded", expanded);
+
+      if (expanded) {
+        var stats = document.createElement("div");
+        stats.className = "card-stats";
+        stats.innerHTML = '<div class="stat"><span class="stat-value">∞</span><span class="stat-label">COMMITS</span></div><div class="stat"><span class="stat-value">12</span><span class="stat-label">PROJECTS</span></div><div class="stat"><span class="stat-value">5</span><span class="stat-label">YEARS</span></div>';
+        card.appendChild(stats);
+
+        if (window.gsap) {
+          gsap.from(stats, {
+            opacity: 0,
+            y: 20,
+            duration: 0.4,
+            ease: "power2.out"
+          });
+        }
+      } else {
+        var stats = card.querySelector(".card-stats");
+        if (stats) {
+          if (window.gsap) {
+            gsap.to(stats, {
+              opacity: 0,
+              y: -10,
+              duration: 0.2,
+              onComplete: function() { stats.remove(); }
+            });
+          } else {
+            stats.remove();
+          }
+        }
+      }
+    });
+  });
+})();
+
+
+/* ===========================
+   INTERACTIVE CORNER TOOLTIPS
+   Show info when hovering corners
+   =========================== */
+(function initCornerTooltips() {
+  document.querySelectorAll(".corner").forEach(function(corner, i) {
+    var tips = ["SYS.INFO", "NAV.MENU", "STATUS.OK", "FOOTER.DATA"];
+    corner.setAttribute("title", tips[i] || "INFO");
+    corner.setAttribute("data-tip", tips[i] || "INFO");
+
+    corner.addEventListener("mouseenter", function() {
+      if (window.gsap) {
+        gsap.to(corner, {
+          scale: 1.3,
+          opacity: 1,
+          duration: 0.2,
+          ease: "back.out(2)"
+        });
+      }
+    });
+
+    corner.addEventListener("mouseleave", function() {
+      if (window.gsap) {
+        gsap.to(corner, {
+          scale: 1,
+          opacity: 0.4,
+          duration: 0.3
+        });
+      }
+    });
+  });
+})();
+
+
+/* ===========================
+   INTERACTIVE SOUND WAVE
+   Visual audio indicator
+   =========================== */
+(function initSoundWave() {
+  if (!window.gsap) return;
+
+  var indicator = document.createElement("div");
+  indicator.className = "sound-wave";
+  indicator.innerHTML = '<div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>';
+  document.querySelector(".hero-scroll").appendChild(indicator);
+
+  var bars = indicator.querySelectorAll(".wave-bar");
+  bars.forEach(function(bar, i) {
+    gsap.to(bar, {
+      scaleY: 0.3 + Math.random() * 0.7,
+      duration: 0.3 + Math.random() * 0.2,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+      delay: i * 0.1
+    });
+  });
+})();
+
+
+/* ===========================
+   INTERACTIVE TOOLTIPS
+   Hover tooltips for elements
+   =========================== */
+(function initTooltips() {
+  var tooltip = document.createElement("div");
+  tooltip.className = "global-tooltip";
+  tooltip.style.cssText = "position:fixed;pointer-events:none;z-index:9999;background:var(--bg);border:1px solid var(--border-bright);padding:6px 12px;font-family:var(--font-mono);font-size:0.7rem;color:var(--primary);opacity:0;transform:translateY(5px);transition:opacity 0.2s,transform 0.2s;";
+  document.body.appendChild(tooltip);
+
+  document.querySelectorAll("[data-tooltip]").forEach(function(el) {
+    el.addEventListener("mouseenter", function() {
+      tooltip.textContent = el.dataset.tooltip;
+      tooltip.style.opacity = "1";
+      tooltip.style.transform = "translateY(0)";
+    });
+
+    el.addEventListener("mousemove", function(e) {
+      tooltip.style.left = e.clientX + 15 + "px";
+      tooltip.style.top = e.clientY + 10 + "px";
+    });
+
+    el.addEventListener("mouseleave", function() {
+      tooltip.style.opacity = "0";
+      tooltip.style.transform = "translateY(5px)";
+    });
+  });
+})();
+
+
+/* ===========================
+   KEYBOARD SHORTCUTS (index.html)
+   =========================== */
+(function initKeyboardShortcuts() {
+  var hints = document.createElement("div");
+  hints.className = "keyboard-hints";
+  hints.innerHTML = '<span class="hint">[G]</span> GSAP <span class="hint">[M]</span> MATRIX <span class="hint">[R]</span> RESET';
+  hints.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;color:var(--text-muted);z-index:500;opacity:0.6;background:rgba(10,8,0,0.8);border:1px solid var(--border);padding:8px 16px;border-radius:4px;";
+  document.body.appendChild(hints);
+
+  document.addEventListener("keydown", function(e) {
+    var key = e.key.toLowerCase();
+
+    if (key === "g") {
+      gsap.globalTimeline.paused() ? gsap.globalTimeline.resume() : gsap.globalTimeline.pause();
+      flashMessage(gsap.globalTimeline.paused() ? "GSAP PAUSED" : "GSAP RESUMED");
+    }
+
+    if (key === "m") {
+      var matrix = document.querySelector(".matrix-wrapper");
+      if (matrix) {
+        matrix.style.display = matrix.style.display === "none" ? "" : "none";
+        flashMessage(matrix.style.display === "none" ? "MATRIX OFF" : "MATRIX ON");
+      }
+    }
+
+    if (key === "r") {
+      window.location.reload();
+    }
+  });
+
+  function flashMessage(text) {
+    var msg = document.createElement("div");
+    msg.textContent = text;
+    msg.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-mono);font-size:2rem;color:var(--blue);text-shadow:0 0 20px var(--blue);z-index:9999;pointer-events:none;";
+    document.body.appendChild(msg);
+    gsap.fromTo(msg, { opacity: 0, scale: 0.8 }, {
+      opacity: 1,
+      scale: 1,
+      duration: 0.2,
+      ease: "back.out(2)",
+      onComplete: function() {
+        gsap.to(msg, {
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.3,
+          delay: 0.5,
+          onComplete: function() { msg.remove(); }
+        });
+      }
+    });
+  }
+})();
+
+
+/* ===========================
+   CLICK PARTICLE EFFECTS (index.html)
+   =========================== */
+(function initClickParticles() {
+  var chars = "01XYxX@#$%&*?!^+-<>/";
+  var sections = document.querySelectorAll(".scroll-section");
+
+  sections.forEach(function(section) {
+    section.addEventListener("click", function(e) {
+      if (e.target.closest("a, button, input, .nav-link")) return;
+
+      var count = 5 + Math.floor(Math.random() * 6);
+      for (var i = 0; i < count; i++) {
+        spawnParticle(e.clientX, e.clientY);
+      }
+    });
+  });
+
+  function spawnParticle(x, y) {
+    var particle = document.createElement("span");
+    particle.className = "click-particle";
+    particle.textContent = chars[Math.floor(Math.random() * chars.length)];
+    particle.style.cssText = "position:fixed;left:" + x + "px;top:" + y + "px;font-family:var(--font-mono);font-size:1rem;color:var(--primary);pointer-events:none;z-index:9999;";
+    document.body.appendChild(particle);
+
+    gsap.to(particle, {
+      x: (Math.random() - 0.5) * 150,
+      y: (Math.random() - 0.5) * 150 - 80,
+      opacity: 0,
+      rotation: Math.random() * 360,
+      scale: Math.random() * 0.5 + 0.5,
+      duration: 0.6 + Math.random() * 0.4,
+      ease: "power2.out",
+      onComplete: function() {
+        particle.remove();
+      }
+    });
+  }
+})();
+
+
+/* ===========================
+   SECTION TRANSITION SOUND FX (Visual feedback)
+   Screen flash on section change
+   =========================== */
+(function initSectionSoundFx() {
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion || !window.gsap) return;
+
+  // Create transition flash element
+  var flash = document.createElement("div");
+  flash.className = "section-transition-flash";
+  flash.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0;";
+  document.body.appendChild(flash);
+
+  // Listen for section changes from the wheel scroll system
+  var originalGoToSection = window.goToSection;
+  if (typeof goToSection === "function") {
+    window.goToSection = function(index) {
+      // Flash effect before transition
+      gsap.to(flash, {
+        opacity: 1,
+        duration: 0.05,
+        ease: "power4.out",
+        onComplete: function() {
+          gsap.to(flash, {
+            opacity: 0,
+            duration: 0.15,
+            ease: "power2.in"
+          });
+        }
+      });
+
+      if (originalGoToSection) {
+        originalGoToSection(index);
+      }
+    };
+  }
+})();
+
+
+/* ===========================
+   MATRIX DIGITAL RAIN ENHANCEMENT
+   Add falling character trails
+   =========================== */
+(function initMatrixEnhancement() {
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion) return;
+
+  var matrixWrapper = document.querySelector(".matrix-wrapper");
+  if (!matrixWrapper) return;
+
+  // Create glow trail particles
+  var trails = document.createElement("div");
+  trails.className = "matrix-trails";
+  trails.innerHTML = '<div class="trail trail--1"></div><div class="trail trail--2"></div>';
+  matrixWrapper.appendChild(trails);
+})();
+
+
+/* ===========================
+   NAVIGATION HOLOGRAPHIC EFFECT
+   Nav appears to have depth/floating effect
+   =========================== */
+(function initNavHolo() {
+  if (!window.gsap) return;
+
+  var header = document.querySelector(".site-header");
+  if (!header) return;
+
+  var lastScroll = 0;
+  var scrollDir = "up";
+
+  window.addEventListener("scroll", function() {
+    var currentScroll = window.scrollY || document.documentElement.scrollTop;
+    scrollDir = currentScroll > lastScroll ? "down" : "up";
+    lastScroll = currentScroll;
+  }, { passive: true });
+
+  // Subtle parallax on nav
+  gsap.to(header, {
+    y: 0,
+    ease: "none",
+    scrollTrigger: {
+      trigger: document.body,
+      start: "top top",
+      end: "200px top",
+      scrub: true,
+      onUpdate: function(self) {
+        if (scrollDir === "down" && self.progress > 0.05) {
+          gsap.to(header, { y: -100, duration: 0.3 });
+        } else {
+          gsap.to(header, { y: 0, duration: 0.3 });
+        }
+      }
+    }
+  });
+})();
+
+
+/* ===========================
+   BUTTON HOLOGRAPHIC SHIMMER
+   Rainbow gradient animation on buttons
+   =========================== */
+(function initButtonShimmer() {
+  if (!window.gsap) return;
+
+  document.querySelectorAll(".btn").forEach(function(btn) {
+    btn.addEventListener("mouseenter", function() {
+      gsap.to(btn, {
+        backgroundPosition: "200% center",
+        duration: 0.6,
+        ease: "power1.inOut"
+      });
+    });
+    btn.addEventListener("mouseleave", function() {
+      gsap.to(btn, {
+        backgroundPosition: "0% center",
+        duration: 0.4
+      });
+    });
+  });
+})();
+
+
+/* ===========================
+   GRID OVERLAY PULSE
+   Pulsing background grid lines
+   =========================== */
+(function initGridPulse() {
+  var gridOverlay = document.createElement("div");
+  gridOverlay.className = "grid-overlay";
+  document.body.appendChild(gridOverlay);
+
+  gsap.to(gridOverlay, {
+    opacity: 0.15,
+    duration: 2,
+    ease: "sine.inOut",
+    yoyo: true,
+    repeat: -1
+  });
+})();
